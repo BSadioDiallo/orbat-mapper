@@ -1,0 +1,5 @@
+# Domaine pédagogique : exercice, affectation, copie de travail filtrée
+
+Un **Exercise** référence une révision figée d'un scénario modèle ; une **Assignment** le publie à une promotion ou une équipe avec dates et politique de visibilité ; chaque **WorkCopy** est un **scénario dérivé et filtré à la publication** (les sides non attribués sont retirés, les références pendantes élaguées, un *snapshot group* peut montrer les unités adverses détectées), puis suivi par un `status` (`DRAFT`, `SUBMITTED`, `LOCKED`, `RETURNED`) et des **Feedback** ancrés sur une unité, une entité de couche, un événement ou un instant. Statut : proposé.
+
+**Options.** Filtrer à chaque lecture selon le rôle : un seul document mais le secret existe côté serveur pour tous les chemins de lecture, risque de fuite par un oubli ; dériver à la publication : retenu, car le document de l'élève ne contient jamais l'adversaire, et le concept existe déjà (`recipientScenario.ts`, GLOSSARY « Recipient export », « Snapshot group »). **Conséquences :** un `ScenarioProjector` Java sur `JsonNode`, avec tests dorés partagés avec les fixtures TypeScript.

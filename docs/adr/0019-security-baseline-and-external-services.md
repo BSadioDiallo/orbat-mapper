@@ -1,0 +1,5 @@
+# Socle de sécurité et neutralisation des services externes
+
+Le produit applique TLS et HSTS, une CSP stricte sans `unsafe-inline` ni `unsafe-eval` (`connect-src 'self'` plus les tuiles internes), CSRF, limitation de débit, validation des entrées (taille, profondeur, URL, `data:`), `rel="noopener noreferrer"` sur les liens Markdown, un marquage de sensibilité des scénarios qui contraint partage et export, et des secrets hors du code. Les services tiers constatés dans le front (fonds de carte de `maplibreConfig.json`, glyphes `demotiles.maplibre.org`, géocodage Photon, altitudes Mapterhorn, fonction Cloudflare `share.ts` dont le « secret » est embarqué dans le bundle) sont **remplacés par des ressources internes ou désactivés**. Statut : proposé.
+
+**Options.** Conserver les services tiers derrière un proxy sortant : fuite de la zone d'exercice et dépendance réseau ; ressources internes : retenues, le front supporte déjà les styles personnalisés, les archives PMTiles et les drapeaux de `runtimeEnvironment.ts`. Le marquage de sensibilité n'est pas une garantie de conformité à une réglementation de classification.

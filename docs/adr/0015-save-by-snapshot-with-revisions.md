@@ -1,0 +1,5 @@
+# Sauvegarde du front par snapshots avec révisions et `If-Match`
+
+Le scenario store reste en mémoire ; la sauvegarde envoie le **document complet** (`serializeToObject()`) par `PUT /scenarios/{id}/content` avec `If-Match: "<seq>"` ; le serveur répond 412 en cas de conflit et 423 si la copie est verrouillée. La mécanique actuelle de brouillons et de révisions (`io.ts`) est conservée : IndexedDB ne sert plus que de **cache de brouillon** et de stockage des handles d'archives PMTiles. Le build `singlefile` est conservé hors périmètre produit. Statut : proposé.
+
+**Options.** Patches RFC 6902 : inutilisables en l'état, car les patches Immer portent sur l'état interne mêlé de champs dérivés et les IDs d'équipement, de personnel, de statuts et de fournitures sont régénérés à chaque chargement (`prepareScenario`) ; opérations métier : à reconsidérer sur mesures, en s'appuyant sur `ActionLabel` ; snapshot : retenu pour sa simplicité et sa robustesse. **Conséquences :** taille maximale configurable (16 Mo par défaut), compression HTTP, indicateur d'état `saved/dirty/saving/offline/conflict/error`.

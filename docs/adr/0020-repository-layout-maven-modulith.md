@@ -1,0 +1,5 @@
+# Dépôt : backend Maven dans `backend/`, modulithe par fonctionnalités
+
+Le backend vit dans `backend/` (Maven, `spring-boot-starter-parent`), le code front neuf dans `src/server/`, la substitution de modules dans `vite.server.config.ts` sur le modèle de `STANDALONE_MODULES`, le schéma dans `schemas/`, le déploiement dans `deploy/` ; les packages Java sont organisés **par fonctionnalité** (`identity`, `organization`, `scenario`, `pedagogy`, `audit`, `media`, `shared`) avec des couches légères et des ports seulement aux frontières externes, contrôlés par des tests d'architecture. Statut : proposé.
+
+**Options.** Gradle : plus rapide en incrémental mais DSL plus variable ; Maven : retenu pour sa convention et sa diffusion (Boot 4.1.2 supporte Maven 3.6.3+ et Gradle 8.14+/9.x). Architecture hexagonale stricte : cérémonie excessive pour un CRUD documentaire ; couches par type : couple les fonctionnalités. **Conséquences :** les fichiers amont modifiés sont listés dans `DIVERGENCES.md` pour limiter les conflits de merge ; le workflow CI du produit est séparé de celui de l'amont.
