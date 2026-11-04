@@ -22,9 +22,10 @@
 
 | Lot 2a — notifications, `/newscenario` | fait | `notifications.spec.ts`, e2e 25/25 (3 passages) |
 | Lot 2b — menu principal, panneau d'infos | fait (partiel) | test composant, e2e 28/28 |
+| Lot 7a — heure et pas de temps sur la carte | fait (partiel) | e2e 31/31 |
 
 ## Tests Angular (apps/web)
-`ng test` : 5 fichiers, 17 tests réussis. e2e : 28/28 (`apps/web/e2e/critical-paths.e2e.cjs`, Chromium headless, 3 passages consécutifs).
+`ng test` : 5 fichiers, 17 tests réussis. e2e : 31/31 (`apps/web/e2e/critical-paths.e2e.cjs`, Chromium headless, 3 passages consécutifs).
 
 ## Prochaine action précise
-Panneau de temps sur la carte (`MapTimeController` : heure courante, jour ±, événements suivant/précédent) ; puis modes Grille/Organigramme, recherche (Ctrl+K), aide clavier (`?`).
+Événements du scénario (liste, détails, `ScenarioEventDetails.vue`) ; puis modes Grille/Organigramme, recherche (Ctrl+K), aide clavier (`?`).

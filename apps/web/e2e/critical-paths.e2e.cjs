@@ -61,6 +61,19 @@ async function renameFirstUnit(page, name) {
       (await page.textContent('[data-testid=scenario-name]')).includes('Narvik'),
     );
 
+    // Time controls over the map.
+    const t0 = (await page.textContent('[data-testid=scenario-time]')).trim();
+    check('scenario time shown', t0.length > 0, t0);
+    await page.click('[data-testid=inc-day]');
+    await page.waitForTimeout(200);
+    const t1 = (await page.textContent('[data-testid=scenario-time]')).trim();
+    check('next day changes the time', t1 !== t0, `${t0} -> ${t1}`);
+    await page.click('[data-testid=dec-day]');
+    await page.waitForTimeout(200);
+    // useScenarioTime().subtract(1, 'day', true) normalizes to noon, as in the Vue app.
+    const t2 = (await page.textContent('[data-testid=scenario-time]')).trim();
+    check('previous day goes back to noon of the first day', t2 === 'Apr 9, 1940, 12:00 PM', t2);
+
     // P-005, P-007, P-008: tree, selection, edit.
     const label = await renameFirstUnit(page, 'Renamed by e2e');
     check('edit updates the tree', label.endsWith('Renamed by e2e'), label);

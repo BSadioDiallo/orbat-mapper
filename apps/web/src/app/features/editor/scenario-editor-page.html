@@ -85,6 +85,9 @@
       </aside>
       <main class="relative min-w-64 flex-auto">
         <app-scenario-map />
+        <div class="pointer-events-none absolute inset-x-0 top-2 flex justify-center">
+          <app-map-time-controller />
+        </div>
       </main>
       @if (selection.activeUnitId()) {
         <div class="border-border w-96 shrink-0 border-l">

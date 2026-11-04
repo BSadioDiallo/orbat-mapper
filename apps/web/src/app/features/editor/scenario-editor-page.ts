@@ -24,6 +24,7 @@ import { ThemeService } from '../../core/ui/theme.service';
 import { ButtonDirective } from '../../shared/ui/button';
 import { Modal } from '../../shared/ui/modal';
 import { ScenarioMap } from '../map/scenario-map';
+import { MapTimeController } from '../map/map-time-controller';
 import { OrbatTree } from './orbat-tree';
 import { ScenarioNotFound } from './scenario-not-found';
 import { UnitDetails } from './unit-details';
@@ -42,6 +43,7 @@ type LeaveChoice = 'save' | 'discard' | 'cancel';
     ButtonDirective,
     Modal,
     ScenarioMap,
+    MapTimeController,
     OrbatTree,
     UnitDetails,
     ScenarioInfoPanel,
