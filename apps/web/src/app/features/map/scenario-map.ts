@@ -12,9 +12,11 @@ import {
 import { Map as MlMap, ScaleControl, setWorkerUrl } from 'maplibre-gl';
 import { centerOfMass, featureCollection, point } from '@turf/turf';
 import { MapLibreMapAdapter } from '@/geo/mapLibreMapAdapter';
+import { useEventLocation } from '@/modules/scenarioeditor/scenarioEvents';
 import { createMapLibreScenarioLayerController } from '@/geo/engines/maplibre/mapLibreScenarioLayerController';
 import { useMaplibreLayersStore } from '@/stores/maplibreLayersStore';
 import { useMapSettingsStore } from '@/stores/mapSettingsStore';
+import { useGeoStore } from '@/stores/geoStore';
 import { useSymbolSettingsStore } from '@/stores/settingsStore';
 import { unitSymbolSize } from '@/symbology/echelonSize';
 import { resolveMaplibreBasemap } from '@/modules/maplibreview/maplibreBasemaps';
@@ -137,8 +139,20 @@ export class ScenarioMap {
         onStyleLoad();
         const adapter = new MapLibreMapAdapter(map);
         const layers = createMapLibreScenarioLayerController(adapter, {});
-        const unbind = layers.bindScenario(this.scenarioService.scenario);
-        this.destroyRef.onDestroy(() => unbind());
+        const scenario = this.scenarioService.scenario;
+        const unbind = layers.bindScenario(scenario);
+        // As ScenarioEditorMaplibre.vue: the geo store drives the camera (zoom to, fly to).
+        const geoStore = useGeoStore();
+        geoStore.setMapAdapter(adapter);
+        // As useScenarioEvents() (scenarioEvents.ts): going to an event frames its location.
+        const { flyToEventLocation } = useEventLocation({ activeScenario: scenario });
+        const offGoTo = scenario.time.onGoToScenarioEventEvent(({ event }) =>
+          flyToEventLocation(event.where),
+        );
+        this.destroyRef.onDestroy(() => {
+          unbind();
+          offGoTo.off();
+        });
         this.fitToScenario(map);
         this.ready.set(true);
       });

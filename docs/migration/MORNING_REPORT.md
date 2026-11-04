@@ -5,7 +5,7 @@
 ## En bref
 - L'app **Angular 22.2.4** (`apps/web`, zoneless, standalone, OnPush, signals, Signal Forms) fait fonctionner **le parcours central** : accueil → démo ou scénario stocké → arbre ORBAT → carte avec unités → sélection → édition → undo/redo → sauvegarde IndexedDB → rechargement, brouillon et invite de sortie.
 - Création de scénario (`/newscenario`), notifications, menu principal (partiel), panneau d'infos du scénario pas de temps (jour, événement), liste et détails des événements portés.
-- Preuves : **17 tests unitaires/composants** Angular, **e2e 35/35** dans Chromium headless, **parité de sérialisation** des 3 démos avec l'app Vue (mêmes données produites après chargement, édition, undo, redo).
+- Preuves : **17 tests unitaires/composants** Angular, **e2e 36/36** dans Chromium headless, **parité de sérialisation** des 3 démos avec l'app Vue (mêmes données produites après chargement, édition, undo, redo).
 - Matrice de parité : **8 lignes vérifiées, 11 partielles, 130 non commencées sur 149**. L'essentiel de l'interface Vue (533 composants) reste à porter.
 
 ## Lancer

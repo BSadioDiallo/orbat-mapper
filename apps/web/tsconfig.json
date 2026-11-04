@@ -23,6 +23,7 @@
       "pinia": ["./src/shims/pinia.ts"],
       "@/scenariostore/localdb": ["./src/app/core/persistence/localdb-adapter.ts"],
       "@/geo/protomapsSprite": ["./src/shims/protomaps-sprite.ts"],
+      "@/composables/scenarioUtils": ["./src/shims/scenario-utils.ts"],
       "@/geo/routing/shortestPath.worker?worker&inline": [
         "./src/shims/workers/shortest-path-worker.ts"
       ],

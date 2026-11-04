@@ -77,3 +77,8 @@ Les décisions structurantes ont aussi un ADR dans `docs/adr/`.
 
 ## D-017 — Preuve de parité de données
 - Un générateur exécuté avec la configuration Vitest de l'app Vue (`apps/web/parity/`) écrit la sérialisation des 3 démos (chargées, puis éditées/annulées/rétablies) ; `parity.spec.ts` rejoue les mêmes étapes dans l'app Angular (shims) et exige l'égalité.
+
+## D-018 — Substitution de `@/composables/scenarioUtils`
+- **Contexte** : ce module importe `@/components/injects`, qui tire (y compris pour la vérification de types) une grande partie des modules Vue de l'éditeur. Le réutiliser imposerait d'étendre les shims à des dizaines de fonctions VueUse.
+- **Choix** : un module de remplacement ne fournit que `useActiveScenario()` (le scénario global de `useScenario()`), ce qui rend `scenarioEvents.ts` réutilisable tel quel. Tout autre export manquant fait échouer la compilation, donc se voit.
+- **Écarté** : `timeFormatStore.ts` (même chaîne d'imports) est remplacé par `TimeFormatService`, qui porte `createFormatter` et lit les mêmes clés de stockage.

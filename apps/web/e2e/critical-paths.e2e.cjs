@@ -247,8 +247,16 @@ async function renameFirstUnit(page, name) {
       'clicking an event moves the clock',
       (await page.textContent('[data-testid=scenario-time]')).trim() !== before,
     );
+    const canvasImage = () =>
+      page.evaluate(() => document.querySelector('[data-testid=scenario-map] canvas').toDataURL());
+    await page.waitForTimeout(2500);
+    const beforeNext = await canvasImage();
     await page.click('[data-testid=next-event]');
-    await page.waitForTimeout(300);
+    await page.waitForTimeout(2500);
+    check(
+      'next event redraws the map (clock and camera; camera move not isolated)',
+      (await canvasImage()) !== beforeNext,
+    );
     const third = (
       await page
         .locator('[data-testid=scenario-event]')

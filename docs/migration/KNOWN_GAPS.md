@@ -49,4 +49,4 @@ Format : élément · symptôme · contournement · piste de correction.
 - **Écart de comportement** : `TimeFormatService` passe le fuseau par `resolveTimeZone` (fuseaux militaires acceptés) ; l'amont passe le nom brut à `Intl`. Identique pour les fuseaux IANA.
 
 ## G-012 — Événements : édition
-- **Symptôme** : ajout, suppression, édition (titre, heure, lieu `where`, médias) et menu d'actions des événements non portés ; le cadrage de la carte sur le lieu de l'événement (`flyToEventLocation`, scenarioEvents.ts) non porté.
+- **Symptôme** : ajout, suppression, édition (titre, heure, lieu `where`, médias) et menu d'actions des événements non portés. Le cadrage sur le lieu (`flyToEventLocation` de `scenarioEvents.ts`, réutilisé) est branché ; l'e2e ne vérifie que le redessin de la carte, pas le cadrage isolément.

@@ -13,9 +13,9 @@ type StoreGetters<G> = {
   readonly [K in keyof G]: G[K] extends (...args: any[]) => infer R ? R : never;
 };
 
-type OptionsStore<S extends AnyRecord, G, A> = UnwrapRef<S> & StoreGetters<G> & A & { $id: string };
+type OptionsStore<S extends object, G, A> = UnwrapRef<S> & StoreGetters<G> & A & { $id: string };
 
-interface OptionsDefinition<S extends AnyRecord, G, A> {
+interface OptionsDefinition<S extends object, G, A> {
   state?: () => S;
   getters?: G &
     ThisType<UnwrapRef<S> & StoreGetters<G>> &
@@ -26,12 +26,12 @@ interface OptionsDefinition<S extends AnyRecord, G, A> {
 const stores = new Map<string, unknown>();
 
 /** Options store, typed like Pinia's: state refs unwrapped, getters as values, actions bound. */
-export function defineStore<S extends AnyRecord, G = object, A = object>(
+export function defineStore<S extends object, G = object, A = object>(
   id: string,
   definition: OptionsDefinition<S, G, A>,
 ): () => OptionsStore<S, G, A>;
 /** Setup store: the returned refs are unwrapped, as in Pinia. */
-export function defineStore<SS extends AnyRecord>(
+export function defineStore<SS extends object>(
   id: string,
   setup: () => SS,
 ): () => UnwrapNestedRefs<SS> & { $id: string };
