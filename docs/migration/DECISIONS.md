@@ -1,7 +1,7 @@
 # Décisions de migration (Vue 3 → Angular 22)
 
 Décisions prises seul pendant la session autonome. Format : contexte, options, choix, raison.
-Les décisions structurantes ont aussi un ADR dans `docs/adr/`.
+Les décisions structurantes ont aussi un ADR dans `docs/adr/` : ADR-0024 (domaine partagé sur `@vue/reactivity`, substitution de modules) et ADR-0025 (app Vue conservée comme référence). Numérotation à partir de 0024 car 0012–0023 sont pris par les ADR backend de la branche `claude/fervent-gauss-l6jtbn`.
 
 ## D-001 — Fichier de mission
 - **Contexte** : la consigne demandait `docs/migration/MISSION.md` ; ce fichier n'existe pas sur `main`. Le seul fichier présent est `docs/migration/MIGRATION.md` (commit `deee662`), qui contient une mission complète.

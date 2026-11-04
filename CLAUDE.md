@@ -36,6 +36,15 @@ The **scenario store** (`src/scenariostore/newScenarioStore.ts`) is the central 
 - Use Immer for complex state updates in the scenario store
 - Do not add Co-Authored-By lines to commit messages
 
+## Angular app (`apps/web`, migration in progress)
+
+- Angular 22, zoneless, standalone, OnPush, signals, Signal Forms; tests with `ng test` (Vitest), specs `*.spec.ts` co-located.
+- The shared code of `src/` is used unchanged through `paths` in `apps/web/tsconfig.json`; `vue`, `@vueuse/core`, `pinia` and a few modules are substituted (`apps/web/src/shims/`). See ADR-0024 and `docs/migration/DECISIONS.md`.
+- Read the store with `ScenarioService.select()` / `reactiveSignal()`; never mutate it from templates; edits go through the domain actions (`unitActions`, `store.update`) so undo/redo works.
+- Persistence only through `SCENARIO_REPOSITORY` (`ScenarioRepository`).
+- Memory of the migration: `docs/migration/MIGRATION_STATUS.md`, `DECISIONS.md`, `KNOWN_GAPS.md`.
+- Root ESLint and Vitest ignore `apps/**`; `apps/web` has its own (`pnpm --filter @orbat-mapper/web lint`).
+
 ## Agent skills
 
 ### Issue tracker

@@ -52,6 +52,16 @@ Make a standalone build, that is one HTML file that runs from your disk without 
 
 For the different deployment options, see https://vitejs.dev/guide/static-deploy.html.
 
+## Angular app (migration in progress)
+
+This fork is migrating the user interface from Vue 3 to Angular 22. The Angular app is in
+`apps/web`; the Vue app at the root stays the reference until parity is verified. Both share the
+domain code in `src/`. State of the migration: `docs/migration/MORNING_REPORT.md`.
+
+    $ pnpm --filter @orbat-mapper/web start     # http://localhost:4200/
+    $ pnpm --filter @orbat-mapper/web test
+    $ pnpm --filter @orbat-mapper/web build
+
 ## Use ORBAT Mapper without an internet connection
 
 ORBAT Mapper is a static client side web application. It can operate without an internet connection, but you must first
