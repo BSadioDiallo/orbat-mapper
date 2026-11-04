@@ -1,6 +1,8 @@
 # Rapport du matin (mis à jour en continu)
 
-**Dernière mise à jour** : 2026-11-04 (session autonome en cours).
+**Dernière mise à jour** : 2026-11-04, fin de session (dernier commit de code : `1c37ce4`, 01:27 UTC). CI GitHub verte sur tous les commits terminés.
+
+**Prochaine action** : édition des événements, puis onglet Couches du panneau gauche, recherche (Ctrl+K), aide clavier (`?`) ; détail dans `MIGRATION_STATUS.md`. Rapport de fin de session : `99-final-report.md`.
 
 ## En bref
 - L'app **Angular 22.2.4** (`apps/web`, zoneless, standalone, OnPush, signals, Signal Forms) fait fonctionner **le parcours central** : accueil → démo ou scénario stocké → arbre ORBAT → carte avec unités → sélection → édition → undo/redo → sauvegarde IndexedDB → rechargement, brouillon et invite de sortie.
