@@ -2,17 +2,7 @@
   <div class="bg-background flex h-dvh flex-col overflow-hidden">
     <nav class="flex shrink-0 items-center justify-between py-1 pr-4 pl-6 print:hidden">
       <div class="flex min-w-0 flex-auto items-center">
-        <a
-          appButton
-          variant="ghost"
-          size="icon"
-          routerLink="/"
-          title="Home"
-          aria-label="Home"
-          data-testid="home"
-        >
-          <svg lucideMenu class="size-6"></svg>
-        </a>
+        <app-main-menu (action)="onMenuAction($event)" />
         <button
           appButton
           variant="ghost"
@@ -99,6 +89,10 @@
       @if (selection.activeUnitId()) {
         <div class="border-border w-96 shrink-0 border-l">
           <app-unit-details />
+        </div>
+      } @else if (showInfoPanel()) {
+        <div class="border-border w-96 shrink-0 border-l">
+          <app-scenario-info-panel />
         </div>
       }
     </div>

@@ -22,6 +22,11 @@ async function waitForEditor(page) {
   await page.waitForSelector('[data-testid=orbat-tree] [role=treeitem]', { timeout: 20000 });
 }
 
+async function goHome(page) {
+  await page.click('[data-testid=main-menu]');
+  await page.click('[role=menuitem]:has-text("Home")');
+}
+
 async function renameFirstUnit(page, name) {
   const first = page.locator('[role=treeitem]').first();
   await first.click();
@@ -129,6 +134,22 @@ async function renameFirstUnit(page, name) {
         .endsWith('Renamed by e2e'),
     );
 
+    // Shell: scenario info, main menu.
+    check(
+      'scenario info shown on open',
+      (await page.locator('[data-testid=scenario-info]').count()) === 1,
+    );
+    check(
+      'scenario info counts units',
+      Number(await page.textContent('[data-testid=scenario-unit-count]')) > 0,
+    );
+    await page.click('[data-testid=main-menu]');
+    await page.click('[role=menuitem]:has-text("File")');
+    await page.waitForSelector('[data-testid=file-menu]');
+    check('File menu opens', true);
+    await page.keyboard.press('Escape');
+    await page.keyboard.press('Escape');
+
     // P-011: draft recovery after a reload with unsaved changes.
     await renameFirstUnit(page, 'Draft name');
     await page.waitForTimeout(2600); // draft debounce of io.ts is 2 s
@@ -144,13 +165,13 @@ async function renameFirstUnit(page, name) {
     );
 
     // P-012: leaving with unsaved changes asks first.
-    await page.click('[data-testid=home]');
+    await goHome(page);
     await page.waitForSelector('text=Unsaved changes', { timeout: 5000 });
     check('leave prompt appears', true);
     await page.click('[role=dialog] button:has-text("Cancel")');
     await page.waitForTimeout(200);
     check('cancel stays in the editor', page.url() === savedUrl, page.url());
-    await page.click('[data-testid=home]');
+    await goHome(page);
     await page.click('[role=dialog] button:has-text("Discard")');
     await page.waitForSelector('[data-testid=landing-scenarios]');
     check('discard leaves to the landing page', true);

@@ -21,9 +21,10 @@
 | Étape 3 — tranche verticale | fait | e2e 21/21, tests composants, parité de sérialisation des 3 démos |
 
 | Lot 2a — notifications, `/newscenario` | fait | `notifications.spec.ts`, e2e 25/25 (3 passages) |
+| Lot 2b — menu principal, panneau d'infos | fait (partiel) | test composant, e2e 28/28 |
 
 ## Tests Angular (apps/web)
-`ng test` : 5 fichiers, 16 tests réussis. e2e : 25/25 (`apps/web/e2e/critical-paths.e2e.cjs`, Chromium headless, 3 passages consécutifs).
+`ng test` : 5 fichiers, 17 tests réussis. e2e : 28/28 (`apps/web/e2e/critical-paths.e2e.cjs`, Chromium headless, 3 passages consécutifs).
 
 ## Prochaine action précise
-Lot « shell » suite : menu principal (Fichier : sauvegarder, télécharger JSON, ouvrir un fichier, dupliquer ; Édition : undo/redo), bouton d'infos du scénario (`ScenarioInfoDetails`), raccourcis globaux (`?`, Ctrl+K) ; puis panneau de temps (`MapTimeController`).
+Panneau de temps sur la carte (`MapTimeController` : heure courante, jour ±, événements suivant/précédent) ; puis modes Grille/Organigramme, recherche (Ctrl+K), aide clavier (`?`).

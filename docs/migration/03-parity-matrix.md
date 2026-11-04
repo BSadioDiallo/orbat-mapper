@@ -150,3 +150,5 @@
 | P-143 | Export |  | user-docs/guide/text-to-orbat.md | non commencé | — |
 
 | P-144 | Notifications (toasts) | components/AppNotifications.vue, NotificationItem.vue | code | vérifié | `notifications.spec.ts` ; e2e : « Scenario saved in browser » après sauvegarde |
+| P-145 | Menu principal : Home, thème, Fichier (télécharger, sauvegarder, nouveau, dupliquer, infos), Édition (undo, redo, revenir à l’état ouvert / sauvegardé, copier) | modules/scenarioeditor/MainMenu.vue, ScenarioEditor.vue#onScenarioAction | code | partiel | CDK Menu ; e2e : ouverture des menus, Home avec invite de sortie ; entrées absentes : chiffrement, chargement, partage, export, import, image, coller, View, Tools, Help (G-010) |
+| P-146 | Panneau d’infos du scénario (onglet Info) | ScenarioInfoPanel.vue, ScenarioInfoDetails.vue | code | partiel | test composant (affichage, édition, undo) ; e2e : affiché à l’ouverture ; heure de début non modifiable, autres onglets absents (G-009) |

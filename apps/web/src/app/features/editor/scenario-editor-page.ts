@@ -9,8 +9,8 @@ import {
   signal,
   untracked,
 } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
-import { LucideMenu, LucideMoonStar, LucideRedo2, LucideSun, LucideUndo2 } from '@lucide/angular';
+import { Router } from '@angular/router';
+import { LucideMoonStar, LucideRedo2, LucideSun, LucideUndo2 } from '@lucide/angular';
 import type { Scenario } from '@/types/scenarioModels';
 import { useNotifications } from '@/composables/notifications';
 import { inputEventFilter } from '@/components/helpers';
@@ -27,6 +27,8 @@ import { ScenarioMap } from '../map/scenario-map';
 import { OrbatTree } from './orbat-tree';
 import { ScenarioNotFound } from './scenario-not-found';
 import { UnitDetails } from './unit-details';
+import { MainMenu, type MainMenuAction } from './main-menu';
+import { ScenarioInfoPanel } from './scenario-info-panel';
 
 type LeaveChoice = 'save' | 'discard' | 'cancel';
 
@@ -37,18 +39,18 @@ type LeaveChoice = 'save' | 'discard' | 'cancel';
 @Component({
   selector: 'app-scenario-editor-page',
   imports: [
-    RouterLink,
     ButtonDirective,
     Modal,
     ScenarioMap,
     OrbatTree,
     UnitDetails,
+    ScenarioInfoPanel,
+    MainMenu,
     ScenarioNotFound,
     LucideUndo2,
     LucideRedo2,
     LucideSun,
     LucideMoonStar,
-    LucideMenu,
   ],
   templateUrl: './scenario-editor-page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -92,6 +94,10 @@ export class ScenarioEditorPage {
   );
   protected readonly savedDirty = this.scenarioService.selectWhenReady(
     (s) => s.io.savedDirty.value,
+    false,
+  );
+  protected readonly showInfoPanel = this.scenarioService.selectWhenReady(
+    () => this.selection.items.showScenarioInfo.value,
     false,
   );
   protected readonly showEditor = computed(
@@ -180,6 +186,44 @@ export class ScenarioEditorPage {
     this.notifications.send({ message: 'Scenario saved in browser' });
     if (previousId !== newId || this.scenarioId() !== newId) {
       await this.router.navigate(['/scenario', newId], { replaceUrl: false });
+    }
+  }
+
+  /** Port of `onScenarioAction` in ScenarioEditor.vue, for the actions of the ported menu. */
+  protected async onMenuAction(action: MainMenuAction): Promise<void> {
+    const io = this.scenarioService.scenario.io;
+    switch (action) {
+      case 'save':
+        await this.save();
+        break;
+      case 'exportJson':
+        await io.downloadAsJson();
+        break;
+      case 'createNew':
+        await this.router.navigate(['/newscenario']);
+        break;
+      case 'duplicate': {
+        const scenarioId = await io.duplicateScenario();
+        await this.router.navigate(['/scenario', scenarioId]);
+        break;
+      }
+      case 'showInfo':
+        this.showScenarioInfo();
+        break;
+      case 'restoreOriginal':
+        if (io.restoreLoadedBaseline()) {
+          this.notifications.send({ message: 'Reverted scenario to the opened state' });
+        }
+        break;
+      case 'revertToSaved':
+        if (io.revertToSaved()) {
+          this.notifications.send({ message: 'Reverted scenario to the saved version' });
+        }
+        break;
+      case 'exportToClipboard':
+        await navigator.clipboard.writeText(io.stringifyScenario());
+        this.notifications.send({ message: 'Scenario copied to clipboard', type: 'success' });
+        break;
     }
   }
 

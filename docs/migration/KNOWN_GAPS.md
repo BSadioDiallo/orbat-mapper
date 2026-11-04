@@ -36,3 +36,10 @@ Format : élément · symptôme · contournement · piste de correction.
 ## G-008 — Nouveau scénario : sélecteurs simplifiés
 - **Symptôme** : `SymbolCodeSelect` (liste illustrée de symboles) et `StandardIdentitySelect` (avec couleur de remplissage personnalisée) sont remplacés par des `<select>` natifs ; la couleur de remplissage d'un side n'est pas proposée.
 - **Piste** : porter ces deux composants avec le lot « UI atomique » (CDK Listbox/Overlay).
+
+## G-009 — Panneau d'infos du scénario partiel
+- **Symptôme** : seul l'onglet Info est porté ; changement de l'heure de début (modale de date) et onglets Groupes, Statuts, Équipements, Personnel, Fournitures absents.
+
+## G-010 — Menu principal partiel
+- **Symptôme** : entrées dont l'écran n'est pas porté laissées de côté : téléchargement chiffré, chargement, partage (en ligne, URL, historique), export, export image, import, coller, menus View, Tools, Help.
+- **Note** : le sous-menu CDK se referme au clic après ouverture au survol ; il est rouvert pour garder le comportement de reka-ui (`MainMenu.keepOpen`).

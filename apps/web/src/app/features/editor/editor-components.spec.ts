@@ -4,6 +4,7 @@ import { SelectionService } from '../../core/ui/selection.service';
 import { loadNarvik } from '../../testing/load-demo';
 import { OrbatTree } from './orbat-tree';
 import { UnitDetails } from './unit-details';
+import { ScenarioInfoPanel } from './scenario-info-panel';
 
 describe('editor components on the Narvik demo', () => {
   beforeEach(() => {
@@ -91,5 +92,37 @@ describe('editor components on the Narvik demo', () => {
     expect(host.querySelector<HTMLButtonElement>('button[type=submit]')!.disabled).toBe(true);
     host.querySelector<HTMLFormElement>('form')!.dispatchEvent(new Event('submit'));
     expect(service.scenario.store.state.unitMap[unitId].name).toBe(original);
+  });
+});
+
+describe('ScenarioInfoPanel on the Narvik demo', () => {
+  beforeEach(() => {
+    TestBed.configureTestingModule({ providers: [provideScenarioRepository()] });
+  });
+
+  it('shows the info of ScenarioInfoDetails.vue and edits it as one undo step', async () => {
+    const service = loadNarvik();
+    const fixture = TestBed.createComponent(ScenarioInfoPanel);
+    await fixture.whenStable();
+    const host: HTMLElement = fixture.nativeElement;
+    const state = service.scenario.store.state;
+    expect(host.querySelector('[data-testid=scenario-unit-count]')!.textContent!.trim()).toBe(
+      String(Object.keys(state.unitMap).length),
+    );
+    expect(host.textContent).toContain(state.info.timeZone);
+
+    host.querySelector<HTMLButtonElement>('[data-testid=edit-scenario-info]')!.click();
+    await fixture.whenStable();
+    const name = host.querySelector<HTMLInputElement>('#scenario-name-input')!;
+    name.value = 'Narvik, edited';
+    name.dispatchEvent(new Event('input'));
+    host.querySelector<HTMLFormElement>('form')!.dispatchEvent(new Event('submit'));
+    await fixture.whenStable();
+    expect(state.info.name).toBe('Narvik, edited');
+    expect(host.querySelector('h2')!.textContent!.trim()).toBe('Narvik, edited');
+
+    service.undo();
+    await fixture.whenStable();
+    expect(service.scenario.store.state.info.name).toBe('Battles of Narvik');
   });
 });
