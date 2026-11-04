@@ -15,7 +15,8 @@ export default defineConfigWithVueTs(
     files: ["**/*.{ts,mts,tsx,vue}"],
   },
 
-  globalIgnores(["**/dist/**", "**/dist-ssr/**", "**/coverage/**"]),
+  // apps/* are linted by their own configuration (apps/web/eslint.config.js).
+  globalIgnores(["**/dist/**", "**/dist-ssr/**", "**/coverage/**", "apps/**"]),
 
   pluginVue.configs["flat/essential"],
   vueTsConfigs.recommended,

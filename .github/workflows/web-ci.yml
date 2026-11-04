@@ -1,0 +1,71 @@
+name: Angular app (apps/web)
+
+on:
+  push:
+    branches: [feat/angular-migration]
+  pull_request:
+    paths:
+      - "apps/web/**"
+      - "src/**"
+      - "public/**"
+      - "pnpm-lock.yaml"
+      - ".github/workflows/web-ci.yml"
+
+jobs:
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm --filter @orbat-mapper/web lint
+
+      - name: Format
+        run: pnpm --filter @orbat-mapper/web format:check
+
+      - name: Type check
+        run: pnpm --filter @orbat-mapper/web type-check
+
+      - name: Unit tests
+        run: pnpm --filter @orbat-mapper/web test
+
+      - name: Build
+        run: pnpm --filter @orbat-mapper/web build
+
+  legacy-vue:
+    # The Vue app stays the reference until parity is verified (docs/migration/DECISIONS.md, D-003).
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: package.json
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Type check
+        run: pnpm run type-check
+
+      - name: Tests
+        run: pnpm run test:unit

@@ -13,7 +13,8 @@ export default mergeConfig(
         ? ["--no-experimental-webstorage"]
         : [],
       silent: true,
-      exclude: [...configDefaults.exclude, "e2e/**", ".claude/**"],
+      // apps/* run their own test runners (apps/web: ng test).
+      exclude: [...configDefaults.exclude, "e2e/**", ".claude/**", "apps/**"],
       root: fileURLToPath(new URL("./", import.meta.url)),
     },
   }),

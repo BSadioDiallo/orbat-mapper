@@ -4,9 +4,7 @@
  */
 import { ref, shallowRef, watch, type Ref, type WatchSource } from '@vue/reactivity';
 
-export interface EventHookOn<T> {
-  (fn: (param: T) => void): { off: () => void };
-}
+export type EventHookOn<T> = (fn: (param: T) => void) => { off: () => void };
 
 export interface EventHook<T> {
   on: EventHookOn<T>;
