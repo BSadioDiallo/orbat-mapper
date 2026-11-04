@@ -49,6 +49,18 @@ export class ScenarioService {
     });
   }
 
+  /** Like `select`, but `fallback` while no scenario is loaded. */
+  selectWhenReady<T>(
+    getter: (scenario: TScenario) => T,
+    fallback: T,
+    injector?: Injector,
+  ): Signal<T> {
+    return reactiveSignal(
+      () => (this.api.isReady.value ? getter(this.api.scenario.value) : fallback),
+      { injector: injector ?? this.injectorForCaller() },
+    );
+  }
+
   private injectorForCaller(): Injector | undefined {
     try {
       return inject(Injector);

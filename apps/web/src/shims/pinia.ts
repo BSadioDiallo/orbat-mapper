@@ -5,19 +5,40 @@
  *
  * Angular UI state does not live here: it lives in signal-based services (DECISIONS.md, D-006).
  */
-import { computed, reactive, toRefs } from '@vue/reactivity';
+import { computed, reactive, toRefs, type UnwrapNestedRefs, type UnwrapRef } from '@vue/reactivity';
 
 type AnyRecord = Record<string, unknown>;
 
-interface OptionsStore {
-  state?: () => AnyRecord;
-  getters?: Record<string, (state: any) => unknown>;
-  actions?: Record<string, (...args: any[]) => unknown>;
+type StoreGetters<G> = {
+  readonly [K in keyof G]: G[K] extends (...args: any[]) => infer R ? R : never;
+};
+
+type OptionsStore<S extends AnyRecord, G, A> = UnwrapRef<S> & StoreGetters<G> & A & { $id: string };
+
+interface OptionsDefinition<S extends AnyRecord, G, A> {
+  state?: () => S;
+  getters?: G &
+    ThisType<UnwrapRef<S> & StoreGetters<G>> &
+    Record<string, (state: UnwrapRef<S>) => unknown>;
+  actions?: A & ThisType<A & UnwrapRef<S> & StoreGetters<G>>;
 }
 
-const stores = new Map<string, AnyRecord>();
+const stores = new Map<string, unknown>();
 
-export function defineStore(id: string, definition: OptionsStore | (() => AnyRecord)): any {
+/** Options store, typed like Pinia's: state refs unwrapped, getters as values, actions bound. */
+export function defineStore<S extends AnyRecord, G = object, A = object>(
+  id: string,
+  definition: OptionsDefinition<S, G, A>,
+): () => OptionsStore<S, G, A>;
+/** Setup store: the returned refs are unwrapped, as in Pinia. */
+export function defineStore<SS extends AnyRecord>(
+  id: string,
+  setup: () => SS,
+): () => UnwrapNestedRefs<SS> & { $id: string };
+export function defineStore(
+  id: string,
+  definition: OptionsDefinition<AnyRecord, AnyRecord, AnyRecord> | (() => AnyRecord),
+): () => unknown {
   return function useStore() {
     const existing = stores.get(id);
     if (existing) return existing;
@@ -27,11 +48,11 @@ export function defineStore(id: string, definition: OptionsStore | (() => AnyRec
     } else {
       store = reactive({ ...(definition.state?.() ?? {}) }) as AnyRecord;
       for (const [name, getter] of Object.entries(definition.getters ?? {})) {
-        const value = computed(() => getter.call(store, store));
+        const value = computed(() => (getter as (s: unknown) => unknown).call(store, store));
         Object.defineProperty(store, name, { get: () => value.value, enumerable: true });
       }
       for (const [name, action] of Object.entries(definition.actions ?? {})) {
-        store[name] = action.bind(store);
+        store[name] = (action as (...args: unknown[]) => unknown).bind(store);
       }
     }
     store['$id'] = id;

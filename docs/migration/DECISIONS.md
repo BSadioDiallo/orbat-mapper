@@ -51,3 +51,29 @@ Les décisions structurantes ont aussi un ADR dans `docs/adr/`.
 - **Contexte** : `xlsx` est installé depuis `cdn.sheetjs.com`, hôte refusé par la politique réseau de la session (403 du proxy). Contourner ce refus est exclu.
 - **Choix** : pour l'installation locale seulement, `xlsx` pointe sur un paquet factice dans le scratchpad, puis `package.json` est restauré et l'entrée du lockfile est remise à l'URL d'origine (vérifié par `pnpm install --frozen-lockfile --lockfile-only`). Rien de factice n'est commité. La CI GitHub, qui a accès à l'hôte, installe le vrai paquet.
 - **Conséquence** : l'import/export XLSX ne peut pas être vérifié ici (KNOWN_GAPS G-002).
+
+## D-011 — Stores partagés comme source de vérité quand le code réutilisé les lit
+- **Contexte** : le contrôleur de couches MapLibre et le domaine lisent `selectedStore`, `mapSettingsStore`, `maplibreLayersStore`, `settingsStore`.
+- **Choix** : ces stores restent la source de vérité (via les shims) ; Angular les expose par des façades à signals (`SelectionService`, `SymbolSettingsService`). Deux sources de vérité synchronisées sont écartées (risque de divergence).
+
+## D-012 — Pont réactivité → signals : `computed` paresseux à double suivi
+- **Contexte** : une première version (effet exécuté à la création) lisait les entrées des composants avant qu'elles existent (NG0950) et ne suivait pas les signaux Angular lus dans le getter.
+- **Choix** : `reactiveSignal` est un `computed` Angular qui exécute le getter dans un `ReactiveEffect` de `@vue/reactivity` ; le planificateur de l'effet incrémente un signal de version. Les deux réactivités sont suivies, rien ne s'exécute avant la première lecture. Couvert par `reactive-signal.spec.ts`.
+
+## D-013 — Sémantique `flush` de `watch`
+- **Contexte** : le `watch` de `@vue/reactivity` est synchrone ; celui du runtime Vue est différé par défaut (`flush: 'pre'`), et du code partagé en dépend (ex. `selectedStore`).
+- **Choix** : le shim `vue` fournit `watch`/`watchEffect` avec `flush` (`pre`/`post` → micro-tâche dédupliquée, `sync` → immédiat).
+
+## D-014 — Spécificités Vite du code partagé
+- `?worker&inline` → adaptateurs `new Worker(new URL(…, import.meta.url))` (syntaxe que le builder Angular regroupe) ; `import.meta.glob` des sprites Protomaps → adaptateur qui lit `/protomaps/sprites/` (copiés par `angular.json` depuis `src/assets`, lien `apps/web/upstream-assets`) ; `import.meta.env.DEV` → `define` dans `angular.json`.
+- `viewshedWorkerClient.ts` importe `./viewshedWorker?worker&inline` en relatif : non substituable par alias, à traiter avec le lot Viewshed (Labs).
+
+## D-015 — Rendu des unités : classe TS `UnitLayer` adaptée de `MlMapLogic.vue`
+- **Contexte** : le rendu des unités de l'amont est dans un composant Vue de ~1 700 lignes (pas dans le contrôleur réutilisable).
+- **Choix** : extraire en classe indépendante du framework les fonctions de rendu (mêmes calculs : `getMilSymbolArgs`, métriques d'ancre, étiquettes) et la piloter par un `effect` Angular. Le reste est listé en G-004.
+
+## D-016 — Formulaires : Signal Forms
+- `@angular/forms/signals` est marqué `@publicApi 22.0` dans les typings installés : utilisé (`form`, `required`, `[formField]`).
+
+## D-017 — Preuve de parité de données
+- Un générateur exécuté avec la configuration Vitest de l'app Vue (`apps/web/parity/`) écrit la sérialisation des 3 démos (chargées, puis éditées/annulées/rétablies) ; `parity.spec.ts` rejoue les mêmes étapes dans l'app Angular (shims) et exige l'égalité.

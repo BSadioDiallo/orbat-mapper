@@ -5,19 +5,19 @@
 
 | ID | Fonctionnalité | Composants Vue | Source | État Angular | Vérification |
 |---|---|---|---|---|---|
-| P-001 | Démarrage de l’app, page d’accueil | views/LandingPage.vue | user-docs + code | non commencé | — |
-| P-002 | Liste des scénarios stockés (tri, ouverture, suppression, duplication, téléchargement, copie) | views/LandingPageScenarios.vue, components/StoredScenarioBrowser.vue, composables/browserScenarios.ts | user-docs + code | non commencé | — |
-| P-003 | Ouverture d’un scénario de démo | views/DemoScenarioCards.vue, scenariostore/io.ts#loadDemoScenario | user-docs + code | non commencé | — |
-| P-004 | Ouverture d’un scénario stocké par URL `/scenario/:id` | modules/scenarioeditor/ScenarioEditorWrapper.vue | user-docs + code | non commencé | — |
-| P-005 | Arbre ORBAT (sides, groupes, unités, dépliage) | components/OrbatTree.vue, OrbatSide.vue, OrbatTreeItem.vue | user-docs + code | non commencé | — |
-| P-006 | Carte MapLibre avec les unités à l’heure courante | modules/maplibreview/ScenarioEditorMaplibre.vue | user-docs + code | non commencé | — |
-| P-007 | Sélection d’une unité (arbre ↔ carte) | stores/selectedStore.ts | user-docs + code | non commencé | — |
-| P-008 | Édition d’une unité (nom, nom court, description, SIDC) | modules/scenarioeditor/UnitDetails.vue, UnitEditForm | user-docs + code | non commencé | — |
-| P-009 | Undo / redo (boutons et raccourcis) | composables/immerStore.ts, ScenarioEditor.vue | user-docs + code | non commencé | — |
-| P-010 | Sauvegarde dans le navigateur et rechargement | scenariostore/io.ts#saveToIndexedDb | user-docs + code | non commencé | — |
-| P-011 | Brouillon automatique et reprise de brouillon | io.ts#persistDraftNow, ScenarioDraftRecoveryModal.vue | user-docs + code | non commencé | — |
-| P-012 | Invite de sauvegarde en quittant | ScenarioLeavePromptModal.vue | user-docs + code | non commencé | — |
-| P-013 | Nouveau scénario | modules/scenarioeditor/NewScenarioView.vue | user-docs + code | non commencé | — |
+| P-001 | Démarrage de l’app, page d’accueil | views/LandingPage.vue | user-docs + code | partiel | page portée (titre, démos, scénarios stockés, thème sombre) ; liens Text to ORBAT / Symbol Browser, collage presse-papier et déchiffrement absents (G-005) ; e2e `apps/web/e2e/critical-paths.e2e.cjs` (21/21) |
+| P-002 | Liste des scénarios stockés (tri, ouverture, suppression, duplication, téléchargement, copie) | views/LandingPageScenarios.vue, components/StoredScenarioBrowser.vue, composables/browserScenarios.ts | user-docs + code | partiel | liste, recherche, tri, actions Open/Delete/Download/Duplicate/Copy portées (menu natif `<select>` au lieu du menu déroulant) ; actions groupées absentes ; ouverture vérifiée par e2e `apps/web/e2e/critical-paths.e2e.cjs` (21/21) |
+| P-003 | Ouverture d’un scénario de démo | views/DemoScenarioCards.vue, scenariostore/io.ts#loadDemoScenario | user-docs + code | vérifié | e2e `apps/web/e2e/critical-paths.e2e.cjs` (21/21) : ouverture de `demo-narvik40`, nom du scénario |
+| P-004 | Ouverture d’un scénario stocké par URL `/scenario/:id` | modules/scenarioeditor/ScenarioEditorWrapper.vue | user-docs + code | vérifié | e2e `apps/web/e2e/critical-paths.e2e.cjs` (21/21) : rechargement de `/scenario/<id>` après sauvegarde |
+| P-005 | Arbre ORBAT (sides, groupes, unités, dépliage) | components/OrbatTree.vue, OrbatSide.vue, OrbatTreeItem.vue | user-docs + code | partiel | sides, groupes, unités, dépliage, symbole, nom court, statut renforcé ; glisser-déposer, menus contextuels, recherche, filtres, virtualisation absents (G-003) ; test `editor-components.spec.ts` |
+| P-006 | Carte MapLibre avec les unités à l’heure courante | modules/maplibreview/ScenarioEditorMaplibre.vue | user-docs + code | partiel | unités à l’heure courante dessinées (capture comparée), entités du scénario par le contrôleur amont ; groupes de visibilité par zoom, symboles personnalisés, anneaux, historique, déplacement absents (G-004) |
+| P-007 | Sélection d’une unité (arbre ↔ carte) | stores/selectedStore.ts | user-docs + code | partiel | arbre → détails vérifié (e2e, test composant) ; clic carte → sélection implémenté, non vérifié automatiquement |
+| P-008 | Édition d’une unité (nom, nom court, description, SIDC) | modules/scenarioeditor/UnitDetails.vue, UnitEditForm | user-docs + code | partiel | nom, nom court, description (Signal Forms, nom requis) vérifiés ; autres onglets de UnitDetails.vue absents |
+| P-009 | Undo / redo (boutons et raccourcis) | composables/immerStore.ts, ScenarioEditor.vue | user-docs + code | vérifié | e2e `apps/web/e2e/critical-paths.e2e.cjs` (21/21) : boutons, Ctrl+Z, Ctrl+Y ; test d’équivalence `reactive-signal.spec.ts` ; Cmd+Z/Cmd+Shift+Z portés, non testés |
+| P-010 | Sauvegarde dans le navigateur et rechargement | scenariostore/io.ts#saveToIndexedDb | user-docs + code | vérifié | e2e `apps/web/e2e/critical-paths.e2e.cjs` (21/21) ; parité de sérialisation `parity.spec.ts` (3 démos, identique à la référence Vue) |
+| P-011 | Brouillon automatique et reprise de brouillon | io.ts#persistDraftNow, ScenarioDraftRecoveryModal.vue | user-docs + code | vérifié | e2e `apps/web/e2e/critical-paths.e2e.cjs` (21/21) : brouillon proposé après rechargement, restauration |
+| P-012 | Invite de sauvegarde en quittant | ScenarioLeavePromptModal.vue | user-docs + code | vérifié | e2e `apps/web/e2e/critical-paths.e2e.cjs` (21/21) : invite, Cancel reste, Discard quitte |
+| P-013 | Nouveau scénario | modules/scenarioeditor/NewScenarioView.vue | user-docs + code | non commencé | route `/newscenario` absente (G-006) |
 | P-014 | Export a chart |  | user-docs/guide/chart-edit-mode.md | non commencé | — |
 | P-015 | Add custom symbols |  | user-docs/guide/custom-symbols.md | non commencé | — |
 | P-016 | Use custom symbols |  | user-docs/guide/custom-symbols.md | non commencé | — |

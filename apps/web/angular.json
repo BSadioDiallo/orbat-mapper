@@ -31,6 +31,16 @@
                 "ignore": [
                   "_redirects"
                 ]
+              },
+              {
+                "glob": "maplibre-gl-worker.mjs",
+                "input": "node_modules/maplibre-gl/dist",
+                "output": "maplibre"
+              },
+              {
+                "glob": "*.{json,png}",
+                "input": "upstream-assets/protomaps/sprites",
+                "output": "protomaps/sprites"
               }
             ],
             "styles": [
@@ -46,10 +56,15 @@
               "dayjs/plugin/utc",
               "earcut",
               "fast-deep-equal",
+              "polygon-clipping",
               "rbush",
               "rfc6902",
-              "skmeans"
-            ]
+              "skmeans",
+              "suncalc"
+            ],
+            "define": {
+              "import.meta.env.DEV": "false"
+            }
           },
           "configurations": {
             "production": {
@@ -70,7 +85,10 @@
             "development": {
               "optimization": false,
               "extractLicenses": false,
-              "sourceMap": true
+              "sourceMap": true,
+              "define": {
+                "import.meta.env.DEV": "true"
+              }
             }
           },
           "defaultConfiguration": "production"

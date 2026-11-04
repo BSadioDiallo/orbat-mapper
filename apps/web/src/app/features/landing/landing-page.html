@@ -1,0 +1,220 @@
+<div class="bg-background flex h-full flex-col overflow-auto">
+  <header
+    class="bg-muted relative top-0 right-0 left-0 flex items-center justify-center gap-8 p-1 text-center"
+  >
+    <p>
+      Follow the
+      <a href="https://github.com/orbat-mapper/orbat-mapper" class="underline"
+        >development on GitHub</a
+      >
+    </p>
+    <button
+      appButton
+      variant="ghost"
+      size="icon"
+      type="button"
+      title="Toggle dark mode"
+      (click)="theme.toggleDark()"
+    >
+      @if (theme.isDark()) {
+        <svg lucideSun></svg>
+      } @else {
+        <svg lucideMoonStar></svg>
+      }
+    </button>
+  </header>
+
+  <main>
+    <section class="mt-16 sm:mt-24">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6">
+        <div class="text-center">
+          <h1 class="text-heading text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl">
+            <span class="text-red-900 dark:text-red-900/90">ORBAT</span>
+            Mapper
+          </h1>
+          <p
+            class="text-muted-foreground mx-auto mt-3 max-w-md text-base sm:text-lg md:mt-5 md:max-w-3xl md:text-xl"
+          >
+            Recreate historic battles and military scenarios in your browser
+          </p>
+          <div class="mt-4 flex flex-wrap items-center justify-center gap-1 text-sm sm:text-base">
+            <a
+              appButton
+              variant="link"
+              href="https://docs.orbat-mapper.app/guide/about-orbat-mapper"
+              target="_blank"
+              rel="noopener noreferrer"
+              >View documentation</a
+            >
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="bg-background relative py-5" data-testid="landing-scenarios">
+      <div class="mx-auto max-w-3xl p-4 text-center">
+        <h2 class="text-heading text-3xl font-bold tracking-tight">Scenarios</h2>
+      </div>
+
+      <section class="mx-auto max-w-7xl p-6" data-testid="stored-scenarios">
+        <header
+          class="border-border flex flex-col gap-4 border-b pb-5 lg:flex-row lg:items-start lg:justify-between"
+        >
+          <div class="flex flex-wrap items-center gap-2">
+            <label class="sr-only" for="scenario-search">Search scenarios</label>
+            <input
+              id="scenario-search"
+              type="search"
+              placeholder="Search scenarios"
+              class="border-input bg-background h-9 rounded-md border px-3 text-sm"
+              [value]="query()"
+              (input)="query.set($any($event.target).value)"
+            />
+            <label class="sr-only" for="scenario-sort">Sort by</label>
+            <select
+              id="scenario-sort"
+              class="border-input bg-background h-9 rounded-md border px-2 text-sm"
+              [value]="stored.sort()"
+              (change)="setSort($any($event.target).value)"
+            >
+              @for (option of sortOptions; track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+            <button
+              appButton
+              variant="outline"
+              size="sm"
+              type="button"
+              (click)="stored.toggleDirection()"
+              [attr.aria-label]="
+                'Sort ' + (stored.direction() === 'asc' ? 'descending' : 'ascending')
+              "
+            >
+              {{ stored.direction() === 'asc' ? '↑' : '↓' }}
+            </button>
+          </div>
+          <div class="flex items-center">
+            <input
+              #fileInput
+              type="file"
+              class="absolute h-[0.1px] w-[0.1px] opacity-0"
+              tabindex="-1"
+              aria-hidden="true"
+              (change)="onFileChange($event)"
+            />
+            <button
+              appButton
+              variant="outline"
+              class="mr-1"
+              type="button"
+              data-testid="header-load-file"
+              (click)="fileInput.click()"
+            >
+              Load from file
+            </button>
+            <a appButton routerLink="/newscenario">Create new</a>
+          </div>
+        </header>
+        @if (loadError()) {
+          <p class="text-destructive mt-2 text-sm" role="alert">Failed to load the file.</p>
+        }
+        @if (stored.scenarios().length > 0) {
+          <ul class="divide-border mt-4 divide-y" data-testid="stored-scenario-list">
+            @for (scenario of filtered(); track scenario.id) {
+              <li class="flex items-center justify-between gap-4 py-3">
+                <a
+                  class="min-w-0 flex-1 hover:underline"
+                  [routerLink]="['/scenario', scenario.id]"
+                  data-testid="stored-scenario-link"
+                >
+                  <p class="text-heading truncate text-sm font-medium">{{ scenario.name }}</p>
+                  <p class="text-muted-foreground text-xs">
+                    Modified {{ scenario.modified | date: 'medium' }} · Created
+                    {{ scenario.created | date: 'mediumDate' }}
+                  </p>
+                </a>
+                <label class="sr-only" [for]="'actions-' + scenario.id">Actions</label>
+                <select
+                  #actionSelect
+                  [id]="'actions-' + scenario.id"
+                  class="border-input bg-background h-8 rounded-md border px-2 text-sm"
+                  (change)="onAction($any(actionSelect.value), scenario, actionSelect)"
+                >
+                  <option value="" selected>Actions…</option>
+                  @for (item of actions; track item.action) {
+                    <option [value]="item.action">{{ item.label }}</option>
+                  }
+                </select>
+              </li>
+            } @empty {
+              <li class="text-muted-foreground py-3 text-sm">No scenarios match</li>
+            }
+          </ul>
+        }
+      </section>
+
+      <section class="mx-auto max-w-7xl p-6">
+        <ul class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          @for (scenario of demos; track scenario.id) {
+            <li
+              class="divide-border bg-card text-card-foreground focus-within:border-primary col-span-1 flex flex-col divide-y overflow-hidden rounded-lg border text-center shadow-sm"
+            >
+              <a
+                class="flex flex-1 flex-col"
+                draggable="false"
+                [routerLink]="['/scenario', 'demo-' + scenario.id]"
+                [attr.data-testid]="'demo-' + scenario.id"
+              >
+                <img
+                  class="bg-muted mx-auto h-52 w-full shrink-0 object-cover object-top"
+                  [src]="scenario.imageUrl"
+                  alt=""
+                  draggable="false"
+                />
+                <h3 class="text-heading mt-6 text-sm font-medium">{{ scenario.name }}</h3>
+                @if (scenario.aiGenerated) {
+                  <p class="mt-2">
+                    <span
+                      class="rounded-full border border-amber-500/50 bg-amber-500/10 px-2 py-0.5 text-xs font-medium text-amber-700 dark:text-amber-400"
+                      >AI-generated</span
+                    >
+                  </p>
+                }
+                <dl class="mt-1 flex grow flex-col justify-between p-4">
+                  <dt class="sr-only">Summary</dt>
+                  <dd class="text-muted-foreground text-sm">{{ scenario.summary }}</dd>
+                </dl>
+              </a>
+            </li>
+          }
+          <li class="col-span-1 flex">
+            <a
+              routerLink="/newscenario"
+              class="border-border hover:border-border/80 focus:ring-ring relative block w-full rounded-lg border-2 border-dashed p-12 text-center focus:ring-2 focus:ring-offset-2 focus:outline-hidden"
+            >
+              <svg
+                class="text-muted-foreground mx-auto h-12 w-12"
+                xmlns="http://www.w3.org/2000/svg"
+                stroke="currentColor"
+                fill="none"
+                viewBox="0 0 48 48"
+                aria-hidden="true"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M8 14v20c0 4.418 7.163 8 16 8 1.381 0 2.721-.087 4-.252M8 14c0 4.418 7.163 8 16 8s16-3.582 16-8M8 14c0-4.418 7.163-8 16-8s16 3.582 16 8m0 0v14m0-4c0 4.418-7.163 8-16 8S8 28.418 8 24m32 10v6m0 0v6m0-6h6m-6 0h-6"
+                />
+              </svg>
+              <span class="text-foreground mt-2 block text-sm font-medium"
+                >Create new scenario</span
+              >
+            </a>
+          </li>
+        </ul>
+      </section>
+    </div>
+  </main>
+</div>

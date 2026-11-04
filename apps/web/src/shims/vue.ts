@@ -33,8 +33,16 @@ export {
   toValue,
   triggerRef,
   unref,
-  watch,
 } from '@vue/reactivity';
+import {
+  watch as reactivityWatch,
+  type WatchCallback,
+  type WatchEffect,
+  type WatchHandle,
+  type WatchOptions as ReactivityWatchOptions,
+  type WatchSource,
+} from '@vue/reactivity';
+
 export type {
   ComputedRef,
   MaybeRef,
@@ -42,9 +50,69 @@ export type {
   Ref,
   ShallowRef,
   UnwrapRef,
+  WatchCallback,
+  WatchEffect,
   WatchHandle,
+  WatchSource,
   WritableComputedRef,
 } from '@vue/reactivity';
+
+/** The `flush` timings of Vue's runtime `watch`, which `@vue/reactivity`'s `watch` lacks. */
+export type WatchFlush = 'pre' | 'post' | 'sync';
+export type WatchOptions<Immediate = boolean> = Omit<
+  ReactivityWatchOptions<Immediate>,
+  'scheduler'
+> & {
+  flush?: WatchFlush;
+};
+
+const queuedJobs = new Set<() => void>();
+let flushQueued = false;
+
+function queueJob(job: () => void): void {
+  queuedJobs.add(job);
+  if (flushQueued) return;
+  flushQueued = true;
+  queueMicrotask(() => {
+    flushQueued = false;
+    const jobs = [...queuedJobs];
+    queuedJobs.clear();
+    for (const run of jobs) run();
+  });
+}
+
+/**
+ * Vue's `watch`: with the default `flush: 'pre'` (and `'post'`) the callback runs after the
+ * current synchronous code, once per tick, as in a Vue app; `flush: 'sync'` runs it at once.
+ * There is no render here, thus `pre` and `post` both run in a microtask.
+ */
+export function watch(
+  source: WatchSource | WatchSource[] | WatchEffect | object,
+  cb?: WatchCallback | null,
+  options: WatchOptions = {},
+): WatchHandle {
+  const { flush, ...rest } = options;
+  if (flush === 'sync') return reactivityWatch(source, cb, rest);
+  return reactivityWatch(source, cb, {
+    ...rest,
+    scheduler: (job, isFirstRun) => {
+      if (isFirstRun) job();
+      else queueJob(job);
+    },
+  });
+}
+
+export function watchEffect(effectFn: WatchEffect, options: WatchOptions = {}): WatchHandle {
+  return watch(effectFn, null, options);
+}
+
+export function watchSyncEffect(effectFn: WatchEffect): WatchHandle {
+  return watch(effectFn, null, { flush: 'sync' });
+}
+
+export function watchPostEffect(effectFn: WatchEffect): WatchHandle {
+  return watch(effectFn, null, { flush: 'post' });
+}
 
 /** Shared code calls these only from Vue components, never on the paths Angular uses. */
 export function onUnmounted(_hook: () => void): void {}

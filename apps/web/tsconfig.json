@@ -22,6 +22,13 @@
       "@vueuse/core": ["./src/shims/vueuse-core.ts"],
       "pinia": ["./src/shims/pinia.ts"],
       "@/scenariostore/localdb": ["./src/app/core/persistence/localdb-adapter.ts"],
+      "@/geo/protomapsSprite": ["./src/shims/protomaps-sprite.ts"],
+      "@/geo/routing/shortestPath.worker?worker&inline": [
+        "./src/shims/workers/shortest-path-worker.ts"
+      ],
+      "@/geo/dayNightTerminator.worker?worker&inline": [
+        "./src/shims/workers/day-night-terminator-worker.ts"
+      ],
       "@/*": ["../../src/*"],
       "@web/*": ["./src/app/*"]
     }

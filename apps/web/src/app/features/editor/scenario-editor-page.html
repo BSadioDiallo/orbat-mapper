@@ -1,0 +1,152 @@
+@if (showEditor()) {
+  <div class="bg-background flex h-dvh flex-col overflow-hidden">
+    <nav class="flex shrink-0 items-center justify-between py-1 pr-4 pl-6 print:hidden">
+      <div class="flex min-w-0 flex-auto items-center">
+        <a
+          appButton
+          variant="ghost"
+          size="icon"
+          routerLink="/"
+          title="Home"
+          aria-label="Home"
+          data-testid="home"
+        >
+          <svg lucideMenu class="size-6"></svg>
+        </a>
+        <button
+          appButton
+          variant="ghost"
+          type="button"
+          class="hidden min-w-0 shrink font-medium sm:inline-flex"
+          [title]="scenarioName()"
+          data-testid="scenario-name"
+        >
+          <span class="truncate">{{ scenarioName() }}</span>
+        </button>
+        @if (savedDirty()) {
+          <button
+            appButton
+            variant="outline"
+            type="button"
+            class="hidden h-6 shrink-0 gap-1 rounded-full px-2 py-0 text-xs sm:inline-flex"
+            title="Save scenario"
+            data-testid="save-scenario"
+            (click)="save()"
+          >
+            <span class="mr-1 size-2 rounded-full bg-amber-500"></span>
+            Save
+          </button>
+        }
+      </div>
+      <div class="flex shrink-0 items-center gap-0.5 overflow-clip sm:gap-2">
+        <div class="flex items-center">
+          <button
+            appButton
+            variant="ghost"
+            size="icon"
+            type="button"
+            class="text-foreground/70"
+            title="Undo action (ctrl+z)"
+            aria-label="Undo"
+            data-testid="undo"
+            [disabled]="!scenarioService.canUndo()"
+            (click)="undo()"
+          >
+            <svg lucideUndo2 class="size-6"></svg>
+          </button>
+          <button
+            appButton
+            variant="ghost"
+            size="icon"
+            type="button"
+            class="text-foreground/70"
+            title="Redo action"
+            aria-label="Redo"
+            data-testid="redo"
+            [disabled]="!scenarioService.canRedo()"
+            (click)="redo()"
+          >
+            <svg lucideRedo2 class="size-6"></svg>
+          </button>
+        </div>
+        <button
+          appButton
+          variant="ghost"
+          size="icon"
+          type="button"
+          title="Toggle dark mode"
+          class="text-foreground/70 hidden sm:inline-flex"
+          (click)="theme.toggleDark()"
+        >
+          @if (theme.isDark()) {
+            <svg lucideSun class="size-5"></svg>
+          } @else {
+            <svg lucideMoonStar class="size-5"></svg>
+          }
+        </button>
+      </div>
+    </nav>
+    <div class="relative flex min-h-0 flex-1">
+      <aside
+        class="bg-sidebar border-border w-80 shrink-0 overflow-auto border-r p-2"
+        aria-label="ORBAT panel"
+      >
+        <app-orbat-tree />
+      </aside>
+      <main class="relative min-w-64 flex-auto">
+        <app-scenario-map />
+      </main>
+      @if (selection.activeUnitId()) {
+        <div class="border-border w-96 shrink-0 border-l">
+          <app-unit-details />
+        </div>
+      }
+    </div>
+  </div>
+} @else if (notFound()) {
+  <app-scenario-not-found />
+}
+
+<app-modal
+  dialogTitle="Recover draft"
+  [open]="showDraftRecovery()"
+  (dismiss)="closeDraftRecovery()"
+>
+  <div class="space-y-4">
+    <p class="text-sm">
+      A newer recovery draft is available for this scenario. You can restore the draft or continue
+      with the last saved version.
+    </p>
+    <div class="flex justify-end gap-2">
+      <button appButton type="button" variant="secondary" (click)="closeDraftRecovery()">
+        Cancel
+      </button>
+      <button appButton type="button" variant="outline" (click)="onOpenSavedVersion()">
+        Open saved version
+      </button>
+      <button appButton type="button" (click)="onRestoreDraft()">Restore draft</button>
+    </div>
+  </div>
+</app-modal>
+
+<app-modal
+  dialogTitle="Unsaved changes"
+  [open]="showLeavePrompt()"
+  (dismiss)="resolveLeave('cancel')"
+>
+  <div class="space-y-4">
+    <p class="text-sm">
+      This scenario has unsaved changes. Save the scenario before leaving, discard the changes, or
+      stay on this page.
+    </p>
+    <div class="flex justify-end gap-2">
+      <button appButton type="button" variant="secondary" (click)="resolveLeave('cancel')">
+        Cancel
+      </button>
+      <button appButton type="button" variant="outline" (click)="resolveLeave('discard')">
+        Discard
+      </button>
+      <button appButton type="button" (click)="resolveLeave('save')">Save</button>
+    </div>
+  </div>
+</app-modal>

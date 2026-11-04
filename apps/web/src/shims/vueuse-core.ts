@@ -2,7 +2,8 @@
  * Stand-in for `@vueuse/core`, limited to the functions the shared framework-independent code
  * imports (see src/shims/vue.ts for why). Each one keeps the contract the shared code relies on.
  */
-import { ref, shallowRef, watch, type Ref, type WatchSource } from '@vue/reactivity';
+import { ref, shallowRef, type Ref, type WatchSource } from '@vue/reactivity';
+import { watch } from './vue';
 
 export type EventHookOn<T> = (fn: (param: T) => void) => { off: () => void };
 
@@ -28,10 +29,25 @@ export function createEventHook<T = void>(): EventHook<T> {
   return { on, off, trigger, clear };
 }
 
-function readStorage<T>(key: string, initial: T): T {
+export interface Serializer<T> {
+  read: (raw: string) => T;
+  write: (value: T) => string;
+}
+
+/** VueUse's serializers, by the name the shared code uses. */
+export const StorageSerializers = {
+  boolean: { read: (v: string) => v === 'true', write: (v: boolean) => String(v) },
+  object: { read: (v: string) => JSON.parse(v), write: (v: unknown) => JSON.stringify(v) },
+  number: { read: (v: string) => Number.parseFloat(v), write: (v: number) => String(v) },
+  any: { read: (v: string) => v, write: (v: unknown) => String(v) },
+  string: { read: (v: string) => v, write: (v: string) => String(v) },
+} satisfies Record<string, Serializer<any>>;
+
+function readStorage<T>(key: string, initial: T, serializer?: Serializer<T>): T {
   try {
     const raw = globalThis.localStorage?.getItem(key);
     if (raw === null || raw === undefined) return initial;
+    if (serializer) return serializer.read(raw);
     if (typeof initial === 'string') return raw as T;
     if (typeof initial === 'number') return Number(raw) as T;
     if (typeof initial === 'boolean') return (raw === 'true') as T;
@@ -41,13 +57,17 @@ function readStorage<T>(key: string, initial: T): T {
   }
 }
 
-function writeStorage<T>(key: string, value: T): void {
+function writeStorage<T>(key: string, value: T, serializer?: Serializer<T>): void {
   try {
     if (value === null || value === undefined) {
       globalThis.localStorage?.removeItem(key);
       return;
     }
-    const raw = typeof value === 'string' ? value : JSON.stringify(value);
+    const raw = serializer
+      ? serializer.write(value)
+      : typeof value === 'string'
+        ? value
+        : JSON.stringify(value);
     globalThis.localStorage?.setItem(key, raw);
   } catch {
     // Storage may be unavailable (private mode, quota). VueUse also swallows these errors.
@@ -55,16 +75,26 @@ function writeStorage<T>(key: string, value: T): void {
 }
 
 /** A ref kept in sync with `localStorage`, serialized like VueUse does for each primitive type. */
-export function useLocalStorage<T>(key: string, initialValue: T, _options?: unknown): Ref<T> {
-  const data = ref(readStorage(key, initialValue)) as Ref<T>;
-  if (globalThis.localStorage?.getItem(key) === null) writeStorage(key, initialValue);
-  watch(data, (value) => writeStorage(key, value), { deep: true });
+export function useLocalStorage<T>(
+  key: string,
+  initialValue: T,
+  options: { serializer?: Serializer<T>; writeDefaults?: boolean; mergeDefaults?: boolean } = {},
+): Ref<T> {
+  const { serializer, writeDefaults = true, mergeDefaults = false } = options;
+  let stored = readStorage(key, initialValue, serializer);
+  // VueUse's `mergeDefaults: true`: a stored object is completed with the default's keys.
+  if (mergeDefaults && stored && typeof stored === 'object' && !Array.isArray(stored)) {
+    stored = { ...(initialValue as object), ...(stored as object) } as T;
+  }
+  const data = ref(stored) as Ref<T>;
+  if (writeDefaults && globalThis.localStorage?.getItem(key) === null) {
+    writeStorage(key, initialValue, serializer);
+  }
+  watch(data, (value) => writeStorage(key, value as T, serializer), { deep: true, flush: 'sync' });
   return data;
 }
 
 export const useStorage = useLocalStorage;
-
-export const StorageSerializers = {} as const;
 
 /** `until(ref).toBe(value)`, the only form the shared code uses. */
 export function until<T>(source: WatchSource<T> | Ref<T>) {

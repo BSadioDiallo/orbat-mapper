@@ -1,3 +1,13 @@
-/* You can add global styles to this file, and also import other style files */
+/* The Vue app's stylesheet (Tailwind v4 theme, shadcn tokens, fonts, typography) is the single
+   source of the look of both apps. */
+@import '../../../src/styles.css';
+@import 'maplibre-gl/dist/maplibre-gl.css';
 
-@import 'tailwindcss';
+/* Angular templates live in the .ts files; the demo data under public/ is not markup. */
+@source "./";
+@source not "../public";
+
+html,
+body {
+  height: 100%;
+}

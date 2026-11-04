@@ -1,4 +1,4 @@
-import { DestroyRef, Injector, runInInjectionContext } from '@angular/core';
+import { DestroyRef, Injector, runInInjectionContext, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { computed as vueComputed } from '@vue/reactivity';
 import { useNewScenarioStore } from '@/scenariostore/newScenarioStore';
@@ -11,15 +11,16 @@ function loadNarvik() {
   return useNewScenarioStore(structuredClone(narvik) as unknown as Scenario);
 }
 
+function inContext<T>(fn: () => T): T {
+  return runInInjectionContext(TestBed.inject(Injector), fn);
+}
+
 describe('reactiveSignal (shared store → Angular signals)', () => {
   it('tracks the same value as a Vue computed through edits, undo and redo', () => {
     const store = loadNarvik();
     const unitActions = useUnitManipulations(store);
     const unitId = Object.keys(store.state.unitMap)[0];
-    const injector = TestBed.inject(Injector);
-    const name = runInInjectionContext(injector, () =>
-      reactiveSignal(() => store.state.unitMap[unitId].name),
-    );
+    const name = inContext(() => reactiveSignal(() => store.state.unitMap[unitId].name));
     const reference = vueComputed(() => store.state.unitMap[unitId].name);
     const original = reference.value;
 
@@ -41,39 +42,63 @@ describe('reactiveSignal (shared store → Angular signals)', () => {
     const store = loadNarvik();
     const unitActions = useUnitManipulations(store);
     const unitId = Object.keys(store.state.unitMap)[0];
-    const injector = TestBed.inject(Injector);
-    const unit = runInInjectionContext(injector, () =>
-      reactiveSignal(() => ({ ...store.state.unitMap[unitId] })),
-    );
+    const unit = inContext(() => reactiveSignal(() => store.state.unitMap[unitId]));
+    expect(unit().shortName).not.toBe('X1');
     unitActions.updateUnit(unitId, { shortName: 'X1' });
     expect(unit().shortName).toBe('X1');
+    // A direct in-place mutation (UI state such as `_isOpen`, set without an undo entry).
+    const before = unit()._isOpen;
+    store.state.unitMap[unitId]._isOpen = !before;
+    expect(unit()._isOpen).toBe(!before);
   });
 
-  it('stops tracking when its injector is destroyed', () => {
+  it('follows Angular signals read by the getter', () => {
+    const store = loadNarvik();
+    const [first, second] = Object.keys(store.state.unitMap);
+    const id = signal(first);
+    const name = inContext(() => reactiveSignal(() => store.state.unitMap[id()].name));
+    expect(name()).toBe(store.state.unitMap[first].name);
+    id.set(second);
+    expect(name()).toBe(store.state.unitMap[second].name);
+  });
+
+  it('does not run the getter before the first read', () => {
+    const store = loadNarvik();
+    let runs = 0;
+    const value = inContext(() =>
+      reactiveSignal(() => {
+        runs++;
+        return store.state.unitMap[Object.keys(store.state.unitMap)[0]].name;
+      }),
+    );
+    expect(runs).toBe(0);
+    value();
+    expect(runs).toBe(1);
+  });
+
+  it('stops tracking when its owner is destroyed', () => {
     const store = loadNarvik();
     const unitId = Object.keys(store.state.unitMap)[0];
-    const child = Injector.create({ providers: [], parent: TestBed.inject(Injector) });
-    let destroyHooks: (() => void)[] = [];
+    const hooks: (() => void)[] = [];
     const destroyRef = {
       onDestroy: (fn: () => void) => {
-        destroyHooks.push(fn);
+        hooks.push(fn);
         return () => undefined;
       },
     } as unknown as DestroyRef;
     let runs = 0;
-    runInInjectionContext(child, () =>
-      reactiveSignal(
-        () => {
-          runs++;
-          return store.state.unitMap[unitId].name;
-        },
-        { destroyRef },
-      ),
+    const name = reactiveSignal(
+      () => {
+        runs++;
+        return store.state.unitMap[unitId].name;
+      },
+      { destroyRef },
     );
+    name();
     expect(runs).toBe(1);
-    destroyHooks.forEach((fn) => fn());
-    destroyHooks = [];
+    hooks.forEach((fn) => fn());
     useUnitManipulations(store).updateUnit(unitId, { name: 'After destroy' });
+    name();
     expect(runs).toBe(1);
   });
 });
