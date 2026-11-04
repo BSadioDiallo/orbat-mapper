@@ -70,9 +70,11 @@ async function renameFirstUnit(page, name) {
 
     // P-009: undo / redo, buttons and keyboard.
     await page.click('[data-testid=undo]');
+    await page.waitForTimeout(200);
     const afterUndo = (await page.locator('[role=treeitem]').first().textContent()).trim();
     check('undo restores the name', !afterUndo.endsWith('Renamed by e2e'), afterUndo);
     await page.click('[data-testid=redo]');
+    await page.waitForTimeout(200);
     check(
       'redo reapplies the name',
       (await page.locator('[role=treeitem]').first().textContent())
@@ -110,6 +112,10 @@ async function renameFirstUnit(page, name) {
     await page.waitForURL(/\/scenario\/(?!demo-)/);
     const savedUrl = page.url();
     check('save gives a stored scenario URL', /\/scenario\/[^/]+$/.test(savedUrl), savedUrl);
+    check(
+      'save shows the notification',
+      (await page.locator('app-notifications').textContent()).includes('Scenario saved in browser'),
+    );
     check(
       'save hides the Save button',
       (await page.locator('[data-testid=save-scenario]').count()) === 0,
@@ -159,6 +165,29 @@ async function renameFirstUnit(page, name) {
       (await page.locator('[role=treeitem]').first().textContent())
         .trim()
         .endsWith('Renamed by e2e'),
+    );
+
+    // P-013: new scenario.
+    await page.goto(base + '/');
+    await page.click('a:has-text("Create new")');
+    await page.waitForSelector('[data-testid=new-scenario-form]');
+    await page.fill('#name-input', 'E2E new scenario');
+    await page.fill('#side-name-0', 'Blue');
+    await page.click('[data-testid=create-scenario]');
+    await waitForEditor(page);
+    check(
+      'new scenario opens in the editor',
+      (await page.textContent('[data-testid=scenario-name]')).includes('E2E new scenario'),
+    );
+    const tree = await page.textContent('[data-testid=orbat-tree]');
+    check(
+      'new scenario has its sides and root units',
+      tree.includes('Blue') && tree.includes('Side 2') && tree.includes('HQ'),
+      tree.trim().slice(0, 80),
+    );
+    check(
+      'new scenario starts with no undo',
+      await page.locator('[data-testid=undo]').isDisabled(),
     );
   } catch (error) {
     check('no unexpected failure', false, error.message.split('\n')[0]);

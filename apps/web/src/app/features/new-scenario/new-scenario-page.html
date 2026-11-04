@@ -1,0 +1,270 @@
+<div class="min-h-screen py-10">
+  <header>
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <h1 class="text-heading text-3xl leading-tight font-bold">Create new scenario</h1>
+      <div class="prose dark:prose-invert mt-4">
+        <p>
+          Here you can provide some initial data for your scenario if you want. You can always
+          change these settings later.
+        </p>
+      </div>
+    </div>
+  </header>
+  <div class="mx-auto my-10 max-w-7xl sm:px-6 lg:px-8">
+    <form class="mt-6 space-y-6" (submit)="create($event)" data-testid="new-scenario-form">
+      <div class="flex items-center justify-between space-x-3 px-4 sm:px-0">
+        <a
+          appButton
+          variant="link"
+          href="https://docs.orbat-mapper.app/guide/getting-started"
+          target="_blank"
+          rel="noopener noreferrer"
+          >View documentation</a
+        >
+        <button appButton type="submit" [disabled]="creating()">Create scenario</button>
+      </div>
+
+      <section class="bg-card border-border rounded-lg border p-6 shadow-sm">
+        <h2 class="text-heading text-lg font-medium">Basic scenario info</h2>
+        <p class="text-muted-foreground mt-1 text-sm">
+          Provide a name and description for your scenario.
+        </p>
+        <div class="mt-4 space-y-4">
+          <div>
+            <label class="text-sm font-medium" for="name-input">Name</label>
+            <input
+              id="name-input"
+              class="border-input bg-background mt-1 h-9 w-full rounded-md border px-3 text-sm"
+              [formField]="scenarioForm.name"
+            />
+            @if (scenarioForm.name().invalid() && scenarioForm.name().touched()) {
+              <p class="text-destructive mt-1 text-xs" role="alert">A name is required.</p>
+            }
+          </div>
+          <div>
+            <label class="text-sm font-medium" for="description-input">Description</label>
+            <textarea
+              id="description-input"
+              rows="4"
+              class="border-input bg-background mt-1 w-full rounded-md border px-3 py-2 text-sm"
+              [formField]="scenarioForm.description"
+            ></textarea>
+            <p class="text-muted-foreground mt-1 text-xs">Use markdown syntax for formatting</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-card border-border rounded-lg border p-6 shadow-sm">
+        <h2 class="text-heading text-lg font-medium">Initial ORBAT</h2>
+        <p class="text-muted-foreground mt-1 text-sm">Sides and root units.</p>
+        <label class="mt-4 flex items-center gap-2 text-sm">
+          <input type="checkbox" [formField]="scenarioForm.noInitialOrbat" />
+          Start with an empty ORBAT
+        </label>
+        @if (!model().noInitialOrbat) {
+          @for (side of model().sides; track $index; let sideIndex = $index) {
+            <fieldset class="border-border mt-6 rounded-md border p-4">
+              <legend class="px-1 text-sm font-medium">Side {{ sideIndex + 1 }}</legend>
+              <div class="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label class="text-sm font-medium" [for]="'side-name-' + sideIndex"
+                    >Side name</label
+                  >
+                  <input
+                    [id]="'side-name-' + sideIndex"
+                    class="border-input bg-background mt-1 h-9 w-full rounded-md border px-3 text-sm"
+                    [formField]="scenarioForm.sides[sideIndex].name"
+                  />
+                </div>
+                <div>
+                  <label class="text-sm font-medium" [for]="'side-sid-' + sideIndex"
+                    >Standard identity</label
+                  >
+                  <select
+                    [id]="'side-sid-' + sideIndex"
+                    class="border-input bg-background mt-1 h-9 w-full rounded-md border px-2 text-sm"
+                    [formField]="scenarioForm.sides[sideIndex].standardIdentity"
+                  >
+                    @for (sid of identities; track sid.code) {
+                      <option [value]="sid.code">{{ sid.text }}</option>
+                    }
+                  </select>
+                </div>
+              </div>
+              @for (unit of side.units; track $index; let unitIndex = $index) {
+                <div class="mt-4 flex flex-wrap items-end gap-4">
+                  <app-military-symbol
+                    [sidc]="unitSidc(unit, side)"
+                    [size]="24"
+                    [options]="{ outlineWidth: 8 }"
+                  />
+                  <div>
+                    <label
+                      class="text-sm font-medium"
+                      [for]="'unit-name-' + sideIndex + '-' + unitIndex"
+                      >Root unit name</label
+                    >
+                    <input
+                      [id]="'unit-name-' + sideIndex + '-' + unitIndex"
+                      class="border-input bg-background mt-1 h-9 rounded-md border px-3 text-sm"
+                      [formField]="scenarioForm.sides[sideIndex].units[unitIndex].rootUnitName"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      class="text-sm font-medium"
+                      [for]="'unit-icon-' + sideIndex + '-' + unitIndex"
+                      >Main icon</label
+                    >
+                    <select
+                      [id]="'unit-icon-' + sideIndex + '-' + unitIndex"
+                      class="border-input bg-background mt-1 h-9 rounded-md border px-2 text-sm"
+                      [formField]="scenarioForm.sides[sideIndex].units[unitIndex].rootUnitIcon"
+                    >
+                      @for (icon of icons; track icon.code) {
+                        <option [value]="icon.code">{{ icon.text }}</option>
+                      }
+                    </select>
+                  </div>
+                  <div>
+                    <label
+                      class="text-sm font-medium"
+                      [for]="'unit-echelon-' + sideIndex + '-' + unitIndex"
+                      >Echelon</label
+                    >
+                    <select
+                      [id]="'unit-echelon-' + sideIndex + '-' + unitIndex"
+                      class="border-input bg-background mt-1 h-9 rounded-md border px-2 text-sm"
+                      [formField]="scenarioForm.sides[sideIndex].units[unitIndex].rootUnitEchelon"
+                    >
+                      @for (echelon of echelons(side.standardIdentity); track echelon.code) {
+                        <option [value]="echelon.code">{{ echelon.text }}</option>
+                      }
+                    </select>
+                  </div>
+                  <button
+                    appButton
+                    variant="ghost"
+                    size="sm"
+                    type="button"
+                    (click)="removeUnit(sideIndex, unitIndex)"
+                  >
+                    Remove
+                  </button>
+                </div>
+              }
+              <button
+                appButton
+                variant="outline"
+                size="sm"
+                type="button"
+                class="mt-4"
+                (click)="addRootUnit(sideIndex)"
+              >
+                Add root unit
+              </button>
+            </fieldset>
+          }
+          <button appButton variant="outline" type="button" class="mt-4" (click)="addSide()">
+            Add side
+          </button>
+        }
+      </section>
+
+      <section class="bg-card border-border rounded-lg border p-6 shadow-sm">
+        <h2 class="text-heading text-lg font-medium">Scenario start time</h2>
+        <p class="text-muted-foreground mt-1 text-sm">Select a start time and time zone.</p>
+        <div class="mt-4">
+          <label class="text-sm font-medium" for="timezone-select">Time zone</label>
+          <select
+            id="timezone-select"
+            class="border-input bg-background mt-1 h-9 w-full rounded-md border px-2 text-sm"
+            [formField]="scenarioForm.timeZone"
+          >
+            @for (tz of timeZones; track tz) {
+              <option [value]="tz">{{ tz }}</option>
+            }
+          </select>
+        </div>
+        <div class="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-5">
+          <div>
+            <label class="text-sm font-medium" for="year-input">Year</label>
+            <input
+              id="year-input"
+              type="number"
+              class="border-input bg-background mt-1 h-9 w-full rounded-md border px-3 text-sm"
+              [formField]="scenarioForm.year"
+            />
+          </div>
+          <div>
+            <label class="text-sm font-medium" for="month-input">Month</label>
+            <input
+              id="month-input"
+              type="number"
+              class="border-input bg-background mt-1 h-9 w-full rounded-md border px-3 text-sm"
+              [formField]="scenarioForm.month"
+            />
+          </div>
+          <div>
+            <label class="text-sm font-medium" for="day-input">Day</label>
+            <input
+              id="day-input"
+              type="number"
+              class="border-input bg-background mt-1 h-9 w-full rounded-md border px-3 text-sm"
+              [formField]="scenarioForm.day"
+            />
+          </div>
+          <div>
+            <label class="text-sm font-medium" for="hour-input">Hour</label>
+            <input
+              id="hour-input"
+              type="number"
+              class="border-input bg-background mt-1 h-9 w-full rounded-md border px-3 text-sm"
+              [formField]="scenarioForm.hour"
+            />
+          </div>
+          <div>
+            <label class="text-sm font-medium" for="minute-input">Minute</label>
+            <input
+              id="minute-input"
+              type="number"
+              class="border-input bg-background mt-1 h-9 w-full rounded-md border px-3 text-sm"
+              [formField]="scenarioForm.minute"
+            />
+          </div>
+        </div>
+        <p class="text-muted-foreground mt-2 font-mono" data-testid="start-time">
+          {{ startTime().format() }}
+        </p>
+      </section>
+
+      <section class="bg-card border-border rounded-lg border p-6 shadow-sm">
+        <h2 class="text-heading text-lg font-medium">Symbology standard</h2>
+        <p class="text-muted-foreground mt-1 text-sm">
+          Select the symbology standard you prefer to use.
+        </p>
+        <div class="mt-4 space-y-2" role="radiogroup" aria-label="Symbology standard">
+          @for (standard of standards; track standard.value) {
+            <label class="flex items-center gap-2 text-sm">
+              <input
+                type="radio"
+                name="symbology-standard"
+                [value]="standard.value"
+                [checked]="model().symbologyStandard === standard.value"
+                (change)="model.update((m) => ({ ...m, symbologyStandard: standard.value }))"
+              />
+              {{ standard.name }}
+            </label>
+          }
+        </div>
+      </section>
+
+      <div class="flex justify-end space-x-3 px-4 sm:px-0">
+        <button appButton type="submit" [disabled]="creating()" data-testid="create-scenario">
+          Create scenario
+        </button>
+        <a appButton variant="secondary" routerLink="/">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>

@@ -17,7 +17,7 @@
 | P-010 | Sauvegarde dans le navigateur et rechargement | scenariostore/io.ts#saveToIndexedDb | user-docs + code | vérifié | e2e `apps/web/e2e/critical-paths.e2e.cjs` (21/21) ; parité de sérialisation `parity.spec.ts` (3 démos, identique à la référence Vue) |
 | P-011 | Brouillon automatique et reprise de brouillon | io.ts#persistDraftNow, ScenarioDraftRecoveryModal.vue | user-docs + code | vérifié | e2e `apps/web/e2e/critical-paths.e2e.cjs` (21/21) : brouillon proposé après rechargement, restauration |
 | P-012 | Invite de sauvegarde en quittant | ScenarioLeavePromptModal.vue | user-docs + code | vérifié | e2e `apps/web/e2e/critical-paths.e2e.cjs` (21/21) : invite, Cancel reste, Discard quitte |
-| P-013 | Nouveau scénario | modules/scenarioeditor/NewScenarioView.vue | user-docs + code | non commencé | route `/newscenario` absente (G-006) |
+| P-013 | Nouveau scénario | modules/scenarioeditor/NewScenarioView.vue | user-docs + code | vérifié | e2e `critical-paths.e2e.cjs` (25/25) : formulaire (nom, sides, unités racines, heure, fuseau, standard), création, ORBAT initial, pas d’undo ; sélecteurs natifs à la place de `SymbolCodeSelect`/`StandardIdentitySelect` (pas de couleur de remplissage) |
 | P-014 | Export a chart |  | user-docs/guide/chart-edit-mode.md | non commencé | — |
 | P-015 | Add custom symbols |  | user-docs/guide/custom-symbols.md | non commencé | — |
 | P-016 | Use custom symbols |  | user-docs/guide/custom-symbols.md | non commencé | — |
@@ -148,3 +148,5 @@
 | P-141 | Drag and drop |  | user-docs/guide/text-to-orbat.md | non commencé | — |
 | P-142 | Open in editor |  | user-docs/guide/text-to-orbat.md | non commencé | — |
 | P-143 | Export |  | user-docs/guide/text-to-orbat.md | non commencé | — |
+
+| P-144 | Notifications (toasts) | components/AppNotifications.vue, NotificationItem.vue | code | vérifié | `notifications.spec.ts` ; e2e : « Scenario saved in browser » après sauvegarde |

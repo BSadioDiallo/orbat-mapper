@@ -14,6 +14,11 @@ export const routes: Routes = [
       import('./features/editor/scenario-editor-page').then((m) => m.ScenarioEditorPage),
     canDeactivate: [leaveScenarioGuard],
   },
+  {
+    path: 'newscenario',
+    loadComponent: () =>
+      import('./features/new-scenario/new-scenario-page').then((m) => m.NewScenarioPage),
+  },
   { path: 'scenario/:scenarioId/maplibre', redirectTo: 'scenario/:scenarioId' },
   { path: 'scenario/:scenarioId/legacy', redirectTo: 'scenario/:scenarioId' },
   { path: 'globe/:scenarioId', redirectTo: 'scenario/:scenarioId' },

@@ -26,6 +26,7 @@
     "@lucide/angular": "^1.67.0",
     "@turf/turf": "^7.4.0",
     "@vue/reactivity": "3.5.44",
+    "@vvo/tzdb": "^6.202.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "compare-versions": "^6.1.1",

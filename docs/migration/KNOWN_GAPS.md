@@ -27,8 +27,12 @@ Format : élément · symptôme · contournement · piste de correction.
 - **Piste** : porter `ImportScenarioView.vue` et `DecryptScenarioModal` (le chiffrement `src/utils/crypto.ts` est partagé).
 
 ## G-006 — Routes non portées
-- `/newscenario`, `/import`, `/text-to-orbat`, `/symbol-browser`, `/scenario/:id/grid-edit`, `/scenario/:id/chart-edit` : redirigées vers l'accueil (`**`).
+- `/import`, `/text-to-orbat`, `/symbol-browser`, `/scenario/:id/grid-edit`, `/scenario/:id/chart-edit` : redirigées vers l'accueil (`**`).
 
 ## G-007 — e2e hors CI
 - **Symptôme** : `apps/web/e2e/critical-paths.e2e.cjs` utilise le Playwright et le Chromium préinstallés de l'environnement ; il n'est pas lancé par la CI GitHub.
 - **Piste** : ajouter `@playwright/test` et l'installation des navigateurs dans un job CI dédié.
+
+## G-008 — Nouveau scénario : sélecteurs simplifiés
+- **Symptôme** : `SymbolCodeSelect` (liste illustrée de symboles) et `StandardIdentitySelect` (avec couleur de remplissage personnalisée) sont remplacés par des `<select>` natifs ; la couleur de remplissage d'un side n'est pas proposée.
+- **Piste** : porter ces deux composants avec le lot « UI atomique » (CDK Listbox/Overlay).

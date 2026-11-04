@@ -20,8 +20,10 @@
 | Étape 1 — inventaire, plan, matrice | fait | `01-inventory.md`, `02-plan.md`, `03-parity-matrix.md` (143 lignes) |
 | Étape 3 — tranche verticale | fait | e2e 21/21, tests composants, parité de sérialisation des 3 démos |
 
+| Lot 2a — notifications, `/newscenario` | fait | `notifications.spec.ts`, e2e 25/25 (3 passages) |
+
 ## Tests Angular (apps/web)
-`ng test` : 4 fichiers, 15 tests réussis. e2e : 21/21 (`apps/web/e2e/critical-paths.e2e.cjs`, Chromium headless).
+`ng test` : 5 fichiers, 16 tests réussis. e2e : 25/25 (`apps/web/e2e/critical-paths.e2e.cjs`, Chromium headless, 3 passages consécutifs).
 
 ## Prochaine action précise
-Lot « shell » : menu principal (Fichier : sauvegarder, télécharger JSON, nouveau, ouvrir), notifications (toasts de `useNotifications`), raccourcis globaux ; puis `/newscenario`.
+Lot « shell » suite : menu principal (Fichier : sauvegarder, télécharger JSON, ouvrir un fichier, dupliquer ; Édition : undo/redo), bouton d'infos du scénario (`ScenarioInfoDetails`), raccourcis globaux (`?`, Ctrl+K) ; puis panneau de temps (`MapTimeController`).
