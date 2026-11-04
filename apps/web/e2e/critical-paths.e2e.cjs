@@ -223,6 +223,44 @@ async function renameFirstUnit(page, name) {
       'new scenario starts with no undo',
       await page.locator('[data-testid=undo]').isDisabled(),
     );
+
+    // Scenario events (Falklands demo has events).
+    await page.goto(base + '/scenario/demo-falkland82');
+    await waitForEditor(page);
+    await page.click('[data-testid=tab-events]');
+    await page.waitForSelector('[data-testid=scenario-event]');
+    const eventCount = await page.locator('[data-testid=scenario-event]').count();
+    check('events tab lists the scenario events', eventCount === 8, String(eventCount));
+    const second = page.locator('[data-testid=scenario-event]').nth(1);
+    const secondTitle = (
+      await second.locator('[data-testid=scenario-event-title]').textContent()
+    ).trim();
+    const before = (await page.textContent('[data-testid=scenario-time]')).trim();
+    await second.click();
+    await page.waitForSelector('[data-testid=event-details]');
+    check(
+      'event details show the clicked event',
+      (await page.textContent('[data-testid=event-title]')).trim() === secondTitle,
+      secondTitle,
+    );
+    check(
+      'clicking an event moves the clock',
+      (await page.textContent('[data-testid=scenario-time]')).trim() !== before,
+    );
+    await page.click('[data-testid=next-event]');
+    await page.waitForTimeout(300);
+    const third = (
+      await page
+        .locator('[data-testid=scenario-event]')
+        .nth(2)
+        .locator('[data-testid=scenario-event-title]')
+        .textContent()
+    ).trim();
+    check(
+      'next event shows the following event',
+      (await page.textContent('[data-testid=event-title]')).trim() === third,
+      third,
+    );
   } catch (error) {
     check('no unexpected failure', false, error.message.split('\n')[0]);
     await page.screenshot({ path: 'e2e-failure.png' });

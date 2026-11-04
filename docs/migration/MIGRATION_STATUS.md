@@ -23,9 +23,10 @@
 | Lot 2a — notifications, `/newscenario` | fait | `notifications.spec.ts`, e2e 25/25 (3 passages) |
 | Lot 2b — menu principal, panneau d'infos | fait (partiel) | test composant, e2e 28/28 |
 | Lot 7a — heure et pas de temps sur la carte | fait (partiel) | e2e 31/31 |
+| Lot 7b — liste et détails des événements | fait (partiel) | e2e 35/35 |
 
 ## Tests Angular (apps/web)
-`ng test` : 5 fichiers, 17 tests réussis. e2e : 31/31 (`apps/web/e2e/critical-paths.e2e.cjs`, Chromium headless, 3 passages consécutifs).
+`ng test` : 5 fichiers, 17 tests réussis. e2e : 35/35 (`apps/web/e2e/critical-paths.e2e.cjs`, Chromium headless, 3 passages consécutifs).
 
 ## Prochaine action précise
-Événements du scénario (liste, détails, `ScenarioEventDetails.vue`) ; puis modes Grille/Organigramme, recherche (Ctrl+K), aide clavier (`?`).
+Cadrage carte sur le lieu d'un événement (`flyToEventLocation`, `scenarioEvents.ts`) ; édition des événements ; puis onglet Couches du panneau gauche, recherche (Ctrl+K), aide clavier (`?`).

@@ -47,3 +47,6 @@ Format : élément · symptôme · contournement · piste de correction.
 ## G-011 — Temps : modale de date et réglages du format
 - **Symptôme** : la modale « Select time and date » et le panneau des formats d'heure ne sont pas portés ; les réglages existants (clés `scenarioTimeFormat`/`trackTimeFormat`) sont lus.
 - **Écart de comportement** : `TimeFormatService` passe le fuseau par `resolveTimeZone` (fuseaux militaires acceptés) ; l'amont passe le nom brut à `Intl`. Identique pour les fuseaux IANA.
+
+## G-012 — Événements : édition
+- **Symptôme** : ajout, suppression, édition (titre, heure, lieu `where`, médias) et menu d'actions des événements non portés ; le cadrage de la carte sur le lieu de l'événement (`flyToEventLocation`, scenarioEvents.ts) non porté.

@@ -30,6 +30,7 @@ import { ScenarioNotFound } from './scenario-not-found';
 import { UnitDetails } from './unit-details';
 import { MainMenu, type MainMenuAction } from './main-menu';
 import { ScenarioInfoPanel } from './scenario-info-panel';
+import { ScenarioEventDetails, ScenarioEventsPanel } from './scenario-events';
 
 type LeaveChoice = 'save' | 'discard' | 'cancel';
 
@@ -47,6 +48,8 @@ type LeaveChoice = 'save' | 'discard' | 'cancel';
     OrbatTree,
     UnitDetails,
     ScenarioInfoPanel,
+    ScenarioEventsPanel,
+    ScenarioEventDetails,
     MainMenu,
     ScenarioNotFound,
     LucideUndo2,
@@ -97,6 +100,16 @@ export class ScenarioEditorPage {
   protected readonly savedDirty = this.scenarioService.selectWhenReady(
     (s) => s.io.savedDirty.value,
     false,
+  );
+  /** The tabs of the left panel (MapEditorDesktopPanel.vue); the others are later lots. */
+  protected readonly tabs = [
+    { id: 'orbat', label: 'ORBAT' },
+    { id: 'events', label: 'Events' },
+  ] as const;
+  protected readonly activeTab = signal<'orbat' | 'events'>('orbat');
+  protected readonly activeEventId = this.scenarioService.selectWhenReady(
+    () => this.selection.items.activeScenarioEventId.value ?? null,
+    null,
   );
   protected readonly showInfoPanel = this.scenarioService.selectWhenReady(
     () => this.selection.items.showScenarioInfo.value,
