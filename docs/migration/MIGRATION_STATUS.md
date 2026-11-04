@@ -24,9 +24,10 @@
 | Lot 2b — menu principal, panneau d'infos | fait (partiel) | test composant, e2e 28/28 |
 | Lot 7a — heure et pas de temps sur la carte | fait (partiel) | e2e 31/31 |
 | Lot 7b — liste et détails des événements, cadrage sur le lieu | fait (partiel) | e2e 36/36 |
+| Correctif — carte non redimensionnée à l'ouverture d'un panneau (icônes décalées de la moitié du panneau, clic inopérant) | fait | `ResizeObserver` ; e2e sélection par la carte |
 
 ## Tests Angular (apps/web)
-`ng test` : 5 fichiers, 17 tests réussis. e2e : 36/36 (`apps/web/e2e/critical-paths.e2e.cjs`, Chromium headless, 3 passages consécutifs).
+`ng test` : 6 fichiers, 18 tests réussis. e2e : 39/39 (`apps/web/e2e/critical-paths.e2e.cjs`, Chromium headless, 3 passages consécutifs).
 
 ## Prochaine action précise
 Édition des événements ; puis onglet Couches du panneau gauche, recherche (Ctrl+K), aide clavier (`?`).

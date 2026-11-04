@@ -126,6 +126,11 @@ export class ScenarioMap {
         canvasContextAttributes: { preserveDrawingBuffer: true },
       });
       this.map = map;
+      // ScenarioEditorMaplibre.vue resizes the map when the details panel opens or closes; a
+      // ResizeObserver covers that and every other change of the container's size.
+      const resizeObserver = new ResizeObserver(() => map.resize());
+      resizeObserver.observe(this.container().nativeElement);
+      this.destroyRef.onDestroy(() => resizeObserver.disconnect());
       map.addControl(new ScaleControl({ maxWidth: 100 }));
       const unitLayer = new UnitLayer(map);
       this.unitLayer = unitLayer;

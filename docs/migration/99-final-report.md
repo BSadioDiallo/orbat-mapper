@@ -11,7 +11,7 @@ App Angular **22.2.4** dans `apps/web` (zoneless, composants standalone, OnPush,
 | Accueil : démos, scénarios stockés (recherche, tri, ouvrir, supprimer, dupliquer, télécharger, copier), thème sombre | e2e |
 | Ouverture d'une démo ou d'un scénario stocké par URL | e2e |
 | Arbre ORBAT (sides, groupes, unités, dépliage, symboles) et sélection | e2e, test composant |
-| Carte MapLibre : unités à l'heure courante, entités du scénario (contrôleur amont réutilisé), clic de sélection | capture comparée (clic carte non testé automatiquement) |
+| Carte MapLibre : unités à l'heure courante, entités du scénario (contrôleur amont réutilisé), sélection par clic | capture comparée, e2e (clic sur une unité, clic dans le vide) |
 | Détails et édition d'une unité (nom, nom court, description) | e2e, tests composants |
 | Undo / redo (boutons, Ctrl+Z, Ctrl+Y) | e2e, test d'équivalence du pont |
 | Sauvegarde IndexedDB, rechargement, brouillon et reprise, invite de sortie | e2e |
@@ -21,11 +21,11 @@ App Angular **22.2.4** dans `apps/web` (zoneless, composants standalone, OnPush,
 | Heure du scénario, jour ±, événement ±, liste et détails des événements, cadrage sur le lieu | e2e |
 | **Parité de données** : chargement, édition, undo, redo des 3 démos sérialisés à l'identique de l'app Vue | `parity.spec.ts` contre `vue-reference.json` produit par l'app Vue |
 
-Chiffres : 17 tests Angular (5 fichiers), e2e **36/36** (`apps/web/e2e/critical-paths.e2e.cjs`), CI GitHub verte sur les commits vérifiés (jobs Angular et Vue de référence). Référence Vue inchangée : 279 fichiers de tests, 2 637 tests réussis.
+Chiffres : 18 tests Angular (6 fichiers), e2e **39/39** (`apps/web/e2e/critical-paths.e2e.cjs`), CI GitHub verte sur les commits vérifiés (jobs Angular et Vue de référence). Référence Vue inchangée : 279 fichiers de tests, 2 637 tests réussis.
 
 ## 2. Ce qui reste
 
-Matrice de parité (`03-parity-matrix.md`) : **8 lignes vérifiées, 11 partielles, 130 non commencées sur 149**. Principaux blocs non portés : modes Grille et Organigramme, dessin (géométries, mesures, graphiques tactiques, symboles ponctuels), couches et fonds de carte, import/export (tous formats ; les convertisseurs sont partagés et prêts à l'emploi), partage, chiffrement, text-to-ORBAT, navigateur de symboles, ToE/ressources/statuts, timeline, lecture et enregistrement, raccourcis et palette de commandes, Labs (viewshed, terrain), mobile. Détails des écarts dans `KNOWN_GAPS.md` (G-001 à G-012).
+Matrice de parité (`03-parity-matrix.md`) : **9 lignes vérifiées, 10 partielles, 130 non commencées sur 149**. Principaux blocs non portés : modes Grille et Organigramme, dessin (géométries, mesures, graphiques tactiques, symboles ponctuels), couches et fonds de carte, import/export (tous formats ; les convertisseurs sont partagés et prêts à l'emploi), partage, chiffrement, text-to-ORBAT, navigateur de symboles, ToE/ressources/statuts, timeline, lecture et enregistrement, raccourcis et palette de commandes, Labs (viewshed, terrain), mobile. Détails des écarts dans `KNOWN_GAPS.md` (G-001 à G-012).
 
 ## 3. Différences de comportement connues
 
@@ -42,7 +42,7 @@ D-001 (fichier de mission), D-003/ADR-0025 (Vue conservée à la racine), D-004/
 
 | Critère | État |
 |---|---|
-| 1. Matrice entièrement vérifiée | **non** (8/149) |
+| 1. Matrice entièrement vérifiée | **non** (9/149) |
 | 2. Build, lint, type-check, tests ; couverture ≥ ligne de base | build/lint/type-check/tests **oui** ; couverture : la ligne de base n'était pas mesurée (aucun outil dans l'amont) |
 | 3. e2e critiques équivalents à la référence | **partiel** (36 contrôles sur le parcours central ; comparaison de données automatisée ; pas de comparaison visuelle automatisée Vue/Angular) |
 | 4. Plus de dépendance Vue/Pinia/vue-router, legacy supprimé | **non** : app Vue conservée (parité non vérifiée) ; `@vue/reactivity` sous le domaine (G-001) ; ni `vue`, ni `pinia`, ni `vue-router` dans `apps/web` |

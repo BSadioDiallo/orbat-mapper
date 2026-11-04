@@ -227,6 +227,25 @@ async function renameFirstUnit(page, name) {
     // Scenario events (Falklands demo has events).
     await page.goto(base + '/scenario/demo-falkland82');
     await waitForEditor(page);
+    // P-007: selection from the map (positions are fixed for this demo at 1400x900).
+    await page.waitForTimeout(2500);
+    await page.mouse.click(582, 258);
+    await page.waitForTimeout(400);
+    check(
+      'clicking a unit on the map selects it',
+      (await page.locator('[data-testid=unit-name]').count()) === 1 &&
+        (await page.textContent('[data-testid=unit-name]')).trim() === 'ARA Bahía Buen Suceso',
+    );
+    check(
+      'the selected unit is highlighted in the tree',
+      (await page.locator('[role=treeitem][aria-selected=true]').count()) === 1,
+    );
+    await page.mouse.click(700, 420);
+    await page.waitForTimeout(400);
+    check(
+      'clicking empty map clears the selection',
+      (await page.locator('[data-testid=unit-details]').count()) === 0,
+    );
     await page.click('[data-testid=tab-events]');
     await page.waitForSelector('[data-testid=scenario-event]');
     const eventCount = await page.locator('[data-testid=scenario-event]').count();
